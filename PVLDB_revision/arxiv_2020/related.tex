@@ -1,0 +1,105 @@
+\enlargethispage{\baselineskip}
+
+\spara{Computational advertising.}
+\eat{
+As advertising on the web has become one of the largest businesses during the last decade, the general area of \emph{computational advertising} has attracted a lot of research interest. The central problem of computational advertising is to find the ``best match'' between a given user in a given context and a suitable advertisement. The context could be a user entering a query in a search engine (``sponsored search"), reading a web page (``content match" and ``display ads"), or watching a movie on a portable device, etc.}
+%%%%
+Considerable work has been done in sponsored search and display ads~\cite{goel08, feldman09,feldman10,mirrokni12,devanur12,mehta13}.
+In sponsored search,
+%:
+\eat{search engines show ads deemed relevant to user queries,
+in the hope of maximizing click-through rates and in turn, revenue.}
+revenue maximization is formalized as
+the well-known {\em Adwords} problem~\cite{adwords}.
+Given a set of keywords and bidders with their daily budgets and bids for each keyword, words need to be assigned to bidders upon arrival, to maximize the revenue for the day, while respecting bidder budgets.
+%and a sequence of words arriving online during the day,
+%During a day, a sequence of words %(all from $Q$)
+%would arrive online and the task is to assign each  word in $Q$ {\sl upon its arrival} to one bidder, so as to maximize the revenue for the given day, subject to the budgets of all bidders.
+This can be solved with a competitive ratio of $(1-1/e)$~\cite{adwords}.
+%This is a generalized online bipartite matching problem, for which a $(1-1/e)$ competitive ratio is achieved using linear programming~\cite{adwords}.
+%Considerable work has been done in sponsored search and display ads~\cite{goel08, feldman09,feldman10,mirrokni12,devanur12,mehta13}.
+%For a comprehensive treatment, see a recent survey~\cite{mehta13}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\spara{Social advertising.} In comparison with computational advertising, social advertising is in its infancy. Recent efforts, including Tucker \cite{tucker12} and Bakshy et al.~\cite{bakshy12}, have shown, by means of field studies on sponsored posts in Facebook's News Feed,
+the importance of taking social influence into account when developing social advertising strategies.
+However, literature on exploiting social influence for social advertising is rather limited.
+Bao and Chang have proposed \emph{AdHeat}~\cite{AdHeat}, a social ad model considering social influence
+ in addition to relevance for matching ads to users.
+%\eat{
+%AdHeat diffuses hint words of influential users to others and then matches ads with users' aggregated hints. Bao and Chang's}
+Their experiments %on a large online Q\&A community
+show that AdHeat significantly outperforms the relevance model on click-through-rate (CTR). Wang et al.~\cite{wang2011learning} propose a new model for learning relevance and apply it for selecting relevant ads for Facebook users.
+\eat{
+In both~\cite{AdHeat}~and~\cite{wang2011learning},  the proposed model is just assessed as a relevance model in terms of CTR: }
+Neither of these works studies viral ad propagation or revenue maximization.
+
+\eat{
+The three papers most related to our proposal have been published in 2015. We next discuss them and how our proposal differentiates and advances beyond this prior work.
+}
+
+%The following are most closely related to our work.
+Chalermsook et al.~\cite{chalermsook} study revenue maximization for the host, when dealing with multiple advertisers. In their setting, each advertiser %$a_i$
+pays the host an amount %$c_i$
+for each product adoption, up to a %monetary
+budget.
+%$B_i$. %However, an important difference from our setting is that in \cite{chalermsook}
+In addition, each advertiser also specifies the maximum size %$s_i$
+of its seed set. This additional constraint considerably simplifies the problem compared to our setting, where the absence of a prespecified seed set size is a \emph{significant challenge}.
+\eat{
+Thus, in practice, they have a double budget: one on the size of the seed set, one on the total CPE. Not having seed set size specified beforehand is a {\em significant challenge} we address in our work.
+}
+\eat{Another key difference with our work is that their propagation model is not topic-aware. A topic-aware propagation model cleanly distingishes between ads that are orthogonal and those that compete for seed users, depending on their proximity in the topic space.}
+\eat{
+Another important difference is that in our model both ads and social influence are \emph{topic-aware}: this produces an interesting natural competition among ads which are close in a topic space for the attention of the users which are influential in the same area of the topic space. Instead Chalermsook et al.~\cite{chalermsook} adopt the simple IC model where all the ads are exactly the same.
+}
+
+Aslay et al.~\cite{AslayLB0L15} study regret minimization for a host supporting campaigns from multiple advertisers. Here, regret is the difference between the monetary budget of an advertiser and the value of expected number of engagements achieved by the campaign, based on the CPE pricing model. They share with us the pricing model and advertiser budget. However, they do not consider seed user costs. Besides they attack a very different optimization problem and their algorithms and results do not carry over to our setting.
+
+\eat{
+also study social advertising through the viral-marketing lenses and show that keeping into account the propensity of ads for viral propagation can achieve significantly better performance. However, uncontrolled virality could be undesirable for the host as it creates room for exploitation by the advertisers: hoping to tap uncontrolled virality, an
+advertiser might declare a lower budget for its marketing campaign,
+aiming at the same large outcome with a smaller cost. Therefore Aslay et al. study the problem of \emph{regret minimization} for ads allocation, where regret is the absolute value of the difference between the budget of one advertiser and the total cost paid by the advertiser to the host based on CPE pricing model.
+Therefore they study a different optimization problem and their business model is different (as they do not consider an explicit monetary incentive to the seed users).
+}
+
+Abbassi et al.~\cite{AbbassiBM15} %also leverage the fact that social cues increase the probability of a user clicking on an ad. However, they
+study a cost-per-mille (CPM) model in display advertising. The host enters into a contract with each advertiser to show their ad to a fixed number of users, for an agreed upon CPM amount per thousand impressions. The problem is that of selecting the sequence of users to show the ads to, in order to maximize the expected number of clicks. This is a substantially different problem which they show is APX-hard and propose heuristic solutions.
+
+\eat{
+differently from our work and~\cite{AslayLB0L15,chalermsook} which are all absed on CPE, they consider a CPM (cost-per-mille) pricing model: i.e., the advertiser enters in a contract with the host for its ad to be shown to a fixed
+number of users, agreeing to pay a certain CPM amount for every thousand impressions. Under this model the number of engagements (or clicks) that the ad receives, does not directly influences the revenue of the host. However, optimizing click-through-rate is nevertheless an important goal as it makes more likely that the advertiser will come back for another advertising campaign. Therefore the problem studied by Abbassi et al~\cite{AbbassiBM15} is that of allocating ads to users so to optimize the number of clicks, for a predefined number of ads impressions, keeping in consideration social influence. Their results are mostly of theoretical interest and negative nature (i.e., hardness and strong inapproximability).
+}
+
+Alon et al.~\cite{alon-etal-opt-budget-www2012} study budget allocation among channels and influential customers, with the intuition that a channel assigned a higher budget will make more attempts at influencing customers. They do not take into account viral propagation. %and consider general influence models.
+Their main result is that for some influence models the budget allocation problem can be approximated, while for others it is inapproximable. %They do not conduct any experiments.
+Notably, none of these previous works studies \emph{incentivized social advertising} where the seed users are paid monetary incentives.
+
+%%%%%%%%%%%%%%%%%%%%%% MAXINF %%%%%%%%%%%%%%%%%%%%%%5
+
+\spara{Viral marketing.}
+\eat{
+As exemplified by the three papers discussed above, our work is also related to viral marketing, whose algorithmic optimization embodiment is the \emph{influence maximization} problem~\cite{kempe03, ChenWW10, goyal12}.
+The wide literature on influence maximization is mostly based on the seminal work by Kempe et al. \cite{kempe03}, which formulated influence maximization as
+a discrete optimization problem: given a social graph and a number $k$, find a set $S$ of $k$ nodes, such that by activating them one maximizes the expected
+spread of influence $\sigma(S)$ under a certain propagation model, e.g., the {\em Independent Cascade} (IC)
+ model. Influence maximization is \NPhard, but the function $\sigma(S)$ is
+\emph{monotone}\footnote{$\sigma(S) \leq \sigma(T)$ whenever $S \subseteq T$.}  and \emph{submodular}\footnote{$\sigma(S \cup \{w\}) - \sigma(S) \geq \sigma(T \cup \{w\}) -
+\sigma(T)$  whenever $S \subseteq T$.}~\cite{kempe03}.
+Exploiting these properties, the simple greedy algorithm that at each step extends the seed set with  the node providing the largest marginal gain, provides a $(1 - 1/e)$-approximation to the optimum \cite{submodular}.
+The greedy algorithm is computationally prohibitive, since selecting the node with the largest marginal gain is \SPhard~\cite{ChenWW10}.
+In Kempe et al. \cite{kempe03} this computation  was approximated by numerous Monte Carlo simulations, which are computationally costly.
+Therefore, considerable effort has been devoted to improve efficiency and scalability for influence maximization: the latest algorithmic advances towards scalable influence maximization~\cite{borgs14,tang14,cohen14,tang2015influence,NguyenTD16} have already been discussed in Section \ref{sec:algorithms}.
+}
+%Research in influence maximization is clearly relevant.
+Kempe et al.~\cite{kempe03} formalize the influence maximization problem which requires to select $k$ seed nodes, where $k$ is a cardinality budget, such that the expected spread of influence from the selected seeds is maximized. Of particular note are the recent advances (already reviewed in Section~\ref{sec:algorithms}) that have been made in designing scalable approximation algorithms~\cite{borgs14,tang14,cohen14,tang2015influence,NguyenTD16} for this hard problem. Numerous variants of the influence maximization problem have been studied over the years, including competition~\cite{BharathiKS07,CarnesNWZ07}, host perspective~\cite{lu2013bang,AslayLB0L15}, non-uniform cost model for seed users~\cite{LeskovecKDD07,nguyen2013budgeted}, and fractional seed selection~\cite{DemaineHMMRSZ14}. However, to our knowledge, there has been no previous work that addresses incentivized social advertising, while leveraging viral propagation of social ads and handling advertiser budgets.
+
+
+
+\eat{
+The key difference between this literature and our setting, is that in the standard influence maximization the budget of an advertiser is modeled as a cardinality constraint on the number of free products to offer, hence the number of seed users to target~\cite{kempe03}. Some work has studied the possibility to target the seed users non-uniformly, that is to say that different seeds might have a different cost, in which case the budget of an advertiser is modeled as a monetary amount that will be spend on the non-uniform costs of incentivizing seed users\cite{LeskovecKDD07}. On the other hand, the real-world social advertisement models operate with monetary budgets, which is used not only for incentivizing the seed users, but more generally for paying the CPE. Hence, the classic treatment of budgets in the optimization of a viral marketing campaign is inadequate for modeling the real-world social advertising scenarios.
+}
+
+
+

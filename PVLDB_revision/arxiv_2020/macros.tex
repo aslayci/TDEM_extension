@@ -1,0 +1,294 @@
+% \usepackage[show]{notes}
+% \usepackage{pgfplots}
+% \usepackage{pgfplots}
+
+\usepackage[show]{chato-notes}
+%\usepackage[hide]{chato-notes}
+\usepackage{rotating}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{cite}
+\usepackage{url}
+\let\proof\relax
+\let\endproof\relax
+\usepackage{amsmath,amssymb, amsthm}
+\usepackage{dsfont}
+\usepackage{epsfig}
+\usepackage{framed}
+\usepackage[ruled,lined,linesnumbered,noend]{algorithm2e}
+\usepackage{multirow}
+\usepackage{capt-of}
+\usepackage{textcomp}
+\usepackage{tabularx}
+\usepackage{bbm}
+\usepackage{times}
+\usepackage{hyperref}
+\def\UrlBreaks{\do\/\do-}
+\hypersetup{
+    bookmarks=true,         % show bookmarks bar?
+    unicode=false,          % non-Latin characters in Acrobats bookmarks
+    pdftoolbar=true,        % show Acrobats toolbar?
+    pdfmenubar=true,        % show Acrobats menu?
+    pdffitwindow=false,     % window fit to page when opened
+    pdfstartview={FitH},    % fits the width of the page to the window
+    pdftitle={My title},    % title
+    pdfauthor={Author},     % author
+    pdfsubject={Subject},   % subject of the document
+    pdfcreator={Creator},   % creator of the document
+    pdfproducer={Producer}, % producer of the document
+    pdfnewwindow=true,      % links in new window
+    colorlinks=false,       % false: boxed links; true: colored links
+    linkcolor=black,          % color of internal links
+    citecolor=black,        % color of links to bibliography
+    filecolor=black,      % color of file links
+    urlcolor=black           % color of external links
+}
+
+
+%%%%%%%%%%% cigdem new %%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\RNum}[1]{\uppercase\expandafter{\romannumeral #1\relax}}
+\newcommand{\val}{\upsilon}
+\newcommand{\ppe}[1]{p_#1}
+\newcommand{\valvec}{\vec{v}}
+\newcommand{\vecppe}{\vec{p}}
+\newcommand{\vecrho}{\vec{\rho}}
+%\newcommand{\ppe}[1]{p^e_#1}
+%\newcommand{\vecppe}{\vec{p^e}}
+\newcommand{\vecalloc}{\vec{S_g}}
+\newcommand{\vecall}{\vec{S}}
+\DeclareMathOperator*{\argmin}{\arg\!\min~}
+\DeclareMathOperator*{\argmax}{\arg\!\max~}
+\newcommand{\EARMLong}{\textsc{Envy-Agnostic Revenue-Maximization}\xspace}
+\newcommand{\EARM}{\textsc{EA-RM}\xspace}
+\newcommand{\EFRM}{\textsc{EF-RM}\xspace}
+\newcommand{\EFRMLong}{\textsc{Envy-Free Revenue-Maximization}\xspace}
+\SetKwRepeat{Do}{do}{while}
+\newcommand{\notimplies}{\mathrel{{\ooalign{\hidewidth$\not\phantom{=}$\hidewidth\cr$\implies$}}}}
+\newcommand{\CSEA}{\textsc{CS-EARM}\xspace}
+\newcommand{\CAEA}{\textsc{CA-EARM}\xspace}
+\newcommand{\me}[1]{e\{{#1}\}}
+\newcommand{\EFDPM}{\textsc{EF-DPM}\xspace}
+\newcommand{\EFGSP}{\textsc{EF-GSP}\xspace}
+\newcommand{\CARM}{\textsc{CA-Greedy}\xspace}
+\newcommand{\CSRM}{\textsc{CS-Greedy}\xspace}
+\newcommand{\RM}{\textsc{RM}\xspace}
+\newcommand{\RMLong}{\textsc{Revenue-Maximization}\xspace}
+\newcommand{\cpe}[1]{cpe({#1})}
+
+
+\newcommand{\fastca}{\textsc{TI-CARM}\xspace}
+\newcommand{\fastcs}{\textsc{TI-CSRM}\xspace}
+\newcommand{\fastAlgoCA}{Two-phase Iterative Cost-Agnostic Revenue Maximization \xspace}
+\newcommand{\fastAlgoCS}{Two-phase Iterative Cost-Sensitive Revenue Maximization \xspace}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+%\renewcommand{\algorithmicensure}{\textbf{Output:}}
+%\renewcommand{\algorithmiccomment}[1]{// #1}
+\newcommand{\hsp}{\hspace*{4ex}}
+\newcommand{\HRule}{\rule{\linewidth}{0.1mm}}
+%\newcommand{\comment}[1]{\textcolor[rgb]{0.3,0.3,0.3}{//#1}}
+
+% Paragraphs
+\newcommand{\spara}[1]{\smallskip\noindent{\bf #1}}
+\newcommand{\mpara}[1]{\medskip\noindent{\bf #1}}
+\newcommand{\para}[1]{\noindent{\bf #1}}
+
+\newtheorem{definition}{Definition}
+\newtheorem{proposition}{Proposition}
+\newtheorem{property}{Property}
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}{Corollary}
+\newtheorem{claim}{Claim}
+\newtheorem{example}{Example}
+\newtheorem{lemma}{Lemma}
+\newtheorem{problem}{Problem}
+\newtheorem{assumption}{Assumption}
+\newtheorem{observation}{Observation}
+\newtheorem{fact}{Fact}
+
+\newcommand{\VecHat}[1]{\vec{\hat{#1}}}
+\newcommand{\Abs}[1]{\left|#1\right|}
+\newcommand{\Tuple}[1]{\left<#1\right>}
+\newcommand{\Set}[1]{\left\{#1\right\}}
+\newcommand{\List}[1]{\left[#1\right]}
+\newcommand{\Paren}[1]{\left(#1\right)}
+\newcommand{\Binom}[2]{\left(#1 \atop #2\right)}
+\newcommand{\Floor}[1]{\left\lfloor #1 \right\rfloor}
+\newcommand{\Ceil}[1]{\left\lceil #1 \right\rceil}
+\newcommand{\IntO}[1]{\left(#1\right)}
+\newcommand{\IntC}[1]{\left[#1\right]}
+\newcommand{\IntLO}[1]{\left(#1\right]}
+\newcommand{\IntRO}[1]{\left[#1\right)}
+\newcommand{\Choose}[2]{\left( #1 \atop #2\right)}
+\newcommand{\Card}[1]{\left\vert{#1}\right\vert}
+
+\newcommand{\refeq}[1]{Eq.~\ref{eq:#1}}
+\newcommand{\reffig}[1]{Figure~\ref{fig:#1}}
+\newcommand{\refex}[1]{Example~\ref{ex:#1}}
+\newcommand{\refalg}[1]{Algorithm~\ref{alg:#1}}
+\newcommand{\reftab}[1]{Table~\ref{tab:#1}}
+\newcommand{\refsec}[1]{Sec.~\ref{sec:#1}}
+\newcommand{\refapp}[1]{Appendix~\ref{sec:#1}}
+\newcommand{\refchap}[1]{Chap.~\ref{chap:#1}}
+
+\newcommand{\LL}[1]{\textcolor{black}{#1}}
+%\newcommand{\LL}[1]{\textcolor{black}{#1}}
+\newcommand{\CA}[1]{\textcolor{black}{#1}}
+\newcommand{\WL}[1]{\textcolor{black}{#1}}
+\newcommand{\AR}[1]{\textcolor{black}{#1}}
+
+%%%%%%%%%%  2020 edits %%%%%%%%%%%%%%%
+\newcommand{\ravi}[1]{\textcolor{black}{#1}}
+\newcommand{\CN}[1]{\textcolor{black}{#1}}
+\newcommand{\CC}[1]{\textcolor{black}{#1}}
+\newcommand{\sstar}{S^*} 
+\newcommand{\ssample}{S^+} 
+\newcommand{\stilde}{\tilde{S}}
+\newcommand{\vecstilde}{\vec{\tilde{S}}}
+\newcommand{\vecssample}{\vec{S}^+}
+\newcommand{\vecsstar}{\vec{S}^*}
+\newcommand{\isfrac}[1]{F_{\RR_i}(#1)}
+\newcommand{\spi}{\tilde{\pi}} %estimated revenue
+\newcommand{\srho}{\tilde{\rho}} %estimated payment 
+\newcommand{\rbudget}[1]{\tilde{B}_{#1}} % refined budget
+\newcommand{\etb}[2]{\eta_{#1,#2}} % eta bound
+\newcommand{\sib}[1]{\bar{s}_{#1}} % upper bound on s^*_i
+%\newcommand{\sib}[1]{{s}^{max}{#1}} % upper bound on s^*_i
+\newcommand{\prob}[1]{\ensuremath{\mathrm{Pr}}\left[#1\right]}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+\newcommand{\I}{\ensuremath{\mathcal{I}}}
+\newcommand{\D}{\ensuremath{\mathbb{D}}}
+%\DeclareMathOperator*{\argmin}{arg\,min}
+%\DeclareMathOperator*{\argmax}{arg\,max}
+
+\newcommand{\Nin}{\ensuremath{N_{\mathrm{in}}}}
+\newcommand{\Nout}{\ensuremath{N_{\mathrm{out}}}}
+\newcommand{\din}{\ensuremath{d_{\mathrm{in}}}}
+\newcommand{\dout}{\ensuremath{d_{\mathrm{out}}}}
+
+\newcommand{\NP}{NP\xspace}
+\newcommand{\NPhard}{NP-hard\xspace}
+\newcommand{\NPcomplete}{NP-complete\xspace}
+\newcommand{\SPcomplete}{\#P-complete\xspace}
+\newcommand{\SPhard}{\#P-hard\xspace}
+
+
+\newcommand{\A}{$\mathcal{A}$\xspace}
+
+\newcommand{\C}{\mbox {${\cal C}$}}
+\newcommand{\cals}{\mbox {${\cal S}$}}
+\newcommand{\cala}{\mbox {${\cal A}$}}
+\newcommand{\calr}{\mbox {${\cal R}$}}
+\newcommand{\cali}{${\cal I}$\xspace}
+\newcommand{\calj}{${\cal J}$\xspace}
+\newcommand{\calb}{\mbox {${\cal B}$}}
+
+%%%%%%%%%%%% VARIOUS SPREADS
+\newcommand{\sigic}{\mbox {$\sigma^{ic}$}}
+\newcommand{\sigicctp}{\mbox {$\sigma^{icctp}$}}
+
+
+\newcommand{\regret}{\mathcal{R}}
+
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\RR}{\mathbf{R}}
+\newcommand{\RQ}{\mathbf{Q}}
+
+%\newcommand{\fastAlgorithm}{Two-phase Iterative Regret Minimization\xspace}
+%\newcommand{\fastAlgo}{\textsc{Tirm}\xspace}
+
+\newcommand{\eat}[1]{}
+
+\newcommand{\old}{\operatorname{old}}
+\newcommand{\merges}{\mathcal{M}}
+\newcommand{\cuts}{\mathcal{C}}
+
+\renewcommand\topfraction{0.85}
+\renewcommand\bottomfraction{0.85}
+\renewcommand\textfraction{0.1}
+\renewcommand\floatpagefraction{0.85}
+\setlength\floatsep{.15\baselineskip plus 3pt minus 2pt}
+\setlength\textfloatsep{.15\baselineskip plus 3pt minus 2pt}
+%\setlength\intextsep{1.25\baselineskip plus 3pt minus 2 pt}
+
+
+%% tight spacing in item lists
+
+\newcommand{\squishlist}{
+ \begin{list}{$\bullet$}
+  {  \setlength{\itemsep}{0pt}
+     \setlength{\parsep}{3pt}
+     \setlength{\topsep}{3pt}
+     \setlength{\partopsep}{0pt}
+     \setlength{\leftmargin}{2em}
+     \setlength{\labelwidth}{1.5em}
+     \setlength{\labelsep}{0.5em}
+} }
+\newcommand{\squishlisttight}{
+ \begin{list}{$\bullet$}
+  { \setlength{\itemsep}{0pt}
+    \setlength{\parsep}{0pt}
+    \setlength{\topsep}{0pt}
+    \setlength{\partopsep}{0pt}
+    \setlength{\leftmargin}{2em}
+    \setlength{\labelwidth}{1.5em}
+    \setlength{\labelsep}{0.5em}
+} }
+
+\newcommand{\squishdesc}{
+ \begin{list}{}
+  {  \setlength{\itemsep}{0pt}
+     \setlength{\parsep}{3pt}
+     \setlength{\topsep}{3pt}
+     \setlength{\partopsep}{0pt}
+     \setlength{\leftmargin}{1em}
+     \setlength{\labelwidth}{1.5em}
+     \setlength{\labelsep}{0.5em}
+} }
+
+\newcommand{\squishend}{
+  \end{list}
+}
+
+
+\newcommand{\flix}{\textsc{Flixster}\xspace}
+\newcommand{\digg}{\textsc{Digg}\xspace}
+\newcommand{\livej}{\textsc{LiveJournal}\xspace}
+\newcommand{\arnet}{\textsc{ArnetMiner}\xspace}
+\newcommand{\irie}{\textsc{Greedy-Irie}\xspace}
+\newcommand{\myopicOne}{\textsc{Myopic}\xspace}
+\newcommand{\myopicTwo}{\textsc{Myopic+}\xspace}
+\newcommand{\rand}{Random\xspace}
+\newcommand{\highdeg}{High-Degree\xspace}
+\newcommand{\hept}{\textsc{NetHEPT}\xspace}
+\newcommand{\epi}{\textsc{Epinions}\xspace}
+\newcommand{\dblp}{\textsc{DBLP}\xspace}
+
+
+
+\newcommand{\wl}[1]{\textcolor{magenta}{#1}\xspace}
+
+%%%%%%%%%%%%%%% various arrows
+\newcommand{\ra}{\rightarrow}
+\newcommand{\la}{\leftarrow}
+\newcommand{\Ra}{\Rightarrow}
+\newcommand{\La}{\Lightarrow}
+%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%% calico's
+\newcommand{\calX}{\mbox{$\mathcal{X}$}}
+\newcommand{\calE}{\mbox{$\mathcal{E}$}}
+\newcommand{\calF}{\mbox{$\mathcal{F}$}}
+\newcommand{\calC}{\mbox{$\mathcal{C}$}}
+\newcommand{\calI}{\mbox{$\mathcal{I}$}}
+\newcommand{\calU}{\mbox{$\mathcal{U}$}}
+%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%
+\newcommand{\posreals}{\mathbb{R}_{\ge 0}}

@@ -1,0 +1,37 @@
+\enlargethispage{\baselineskip}
+
+In this paper, we initiate the investigation of incentivized social advertising,
+by formalizing the fundamental problem of revenue maximization from the
+host perspective. In our formulation, incentives paid to the seed users are determined by
+their demonstrated past influence in the topic of the specific ad. We show that,
+keeping all important factors -- topical relevance of ads, their propensity for
+social propagation, the topical influence of users, seed users' incentives, and advertiser
+budgets -- in consideration, the problem of revenue maximization in incentivized
+social advertising is NP-hard and it corresponds to the problem of monotone submodular
+function maximization subject to a partition matroid constraint on the
+ads-to-seeds allocation and multiple submodular knapsack constraints on the advertiser
+budgets.
+For this problem, we devise two natural greedy algorithms that differ in
+their sensitivity to seed user incentive costs, provide
+formal approximation guarantees, and achieve scalability by adapting to our context  recent advances made in scalable estimation of expected influence spread.
+
+Our work takes an important first step toward enriching the framework of incentivized
+social advertising with powerful ideas from viral marketing, while
+making the latter more applicable to real-world online marketing. It opens up several interesting avenues for further research: \LL{$(i)$ it remains open whether our winning algorithm \fastcs can be made more memory efficient hence more scalable; $(ii)$ it remains open whether the approximation bound for \CSRM provided in Theorem~\ref{theo:cs-earm1} is tight; $(iii)$ it is interesting to integrate hard competition constraints into the influence propagation process; $(iv)$ it is worth studying our problem in an online adaptive setting where the partial results of the campaign can be taken into account while deciding the next moves.}
+All  these directions  offer a
+wealth of possibilities for future work.
+
+%
+%\LL{$(ii)$ the tightness of the approximation bound for \CSRM provided in Theorem~\ref{theo:cs-earm1} is open;\footnote{\small Interestingly, on the instance in the proof of Theorem~\ref{theo:CARM}, \CSRM obtains the optimal solution $T$.}} \LL{$(iii)$ it is worth studying our problem in an online adaptive setting where the partial results of the campaign can be taken into account while deciding the next moves.}
+
+%Our work takes an important first step toward enriching the framework of incentivized
+%social advertising with powerful ideas from viral marketing, while
+%making the latter more applicable to real-world online marketing. It opens
+%up several interesting avenues for further research: $(i)$ it remains open whether our winning algorithm \fastcs can be made more memory efficient and hence more scalable;   $(ii)$ capturing the auction dynamics
+%of real-world social advertising by integrating algorithmic
+%mechanism design techniques into the allocation of ads is an interesting problem; $(iii)$ it is interesting to integrate hard competition
+%constraints into the influence propagation process; \LL{$(iv)$ it is worth studying our problem in an online adaptive setting where the partial results of the campaign can be taken into account while deciding the next moves.}
+%All  these directions  offer a
+%wealth of possibilities for future work.
+
+

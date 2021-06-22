@@ -1,0 +1,14 @@
+\enlargethispage{4\baselineskip}
+Incentivized social advertising, an emerging marketing model, provides monetization opportunities not only to the owners of the social networking  platforms but also to their influential users by offering a ``cut'' on the advertising revenue. We consider a social network (the host) that sells ad-engagements to advertisers by inserting their ads, in the form of promoted posts, into the feeds of carefully selected ``initial endorsers" or seed users: these users receive monetary incentives in exchange for their endorsements. The endorsements help propagate the ads to the feeds of their followers. Whenever any user of the platform engages with an ad, the host is paid some fixed amount by the advertiser, and the ad further propagates to the feed of her followers, potentially recursively. In this context, the problem for the host is is to allocate ads to influential users, taking into account the propensity of ads for viral propagation, and carefully apportioning the monetary budget of each of the advertisers between incentives to influential users and ad-engagement costs, with the rational goal of maximizing its own revenue.
+In particular, we consider a monetary incentive for the influential users, which is proportional to their influence potential.
+
+We show that, taking all important factors into account, the problem of revenue maximization in incentivized social advertising corresponds to the problem of monotone submodular function maximization, subject to a partition matroid constraint on the ads-to-seeds allocation, and submodular knapsack constraints on the advertisers' budgets. We show that this problem is NP-hard and devise two greedy algorithms with provable approximation guarantees, which differ in their sensitivity to seed user incentive costs.
+
+Our approximation algorithms require repeatedly estimating the expected marginal gain in revenue as well as in advertiser payment. By exploiting a connection to the recent advances made in scalable estimation of expected influence spread, we devise efficient and scalable versions of our two greedy algorithms. An extensive experimental assessment confirms the high quality of our proposal.
+
+
+
+
+
+
+

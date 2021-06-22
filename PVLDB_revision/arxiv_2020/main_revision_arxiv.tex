@@ -1,0 +1,95 @@
+\documentclass{vldb}
+%\documentclass{sig-alternate-05-2015}
+\input{macros.tex}
+%\pdfpagewidth=8.5in
+%\pdfpageheight=11in
+%\frenchspacing
+
+\begin{document}
+\title{Revenue Maximization in Incentivized Social Advertising}
+\author{\begin{tabular}{cccc}
+Cigdem Aslay & \hspace{2mm}  Francesco Bonchi &  \hspace{1mm} Laks V.S. Lakshmanan &  Wei Lu\\
+%\multicolumn{2}{c}{ISI Foundation} &  Univ. of British Columbia &  LinkedIn\\
+%\multicolumn{2}{c}{Turin, Italy} & Vancouver, Canada & USA\\
+%\multicolumn{2}{c}{{\sf name.surname@isi.it}} & {\sf laks@cs.ubc.ca} & {\sf welu@cs.ubc.ca}
+\affaddr{ISI Foundation} & \hspace{2mm}  \affaddr{ISI Foundation} &  \hspace{1mm} \affaddr{Univ. of British Columbia} &  \affaddr{LinkedIn Corp.}\\
+\affaddr{Turin, Italy} & \hspace{2mm} \affaddr{Turin, Italy}  &  \hspace{1mm} \affaddr{Vancouver, Canada} & \affaddr{Sunnyvale, CA, USA}\\
+{\sf cigdem.aslay@isi.it} & \hspace{2mm}  {\sf francesco.bonchi@isi.it} &  \hspace{1mm}{\sf laks@cs.ubc.ca} & {\sf wlu@linkedin.com}
+\end{tabular}
+}
+
+\maketitle
+\sloppy
+%SECOND BEST TITLE
+%\title{Incentivised Social Advertising: Revenue Maximization under Matroid and Submodular Knapsack Constraints}
+
+% ALTERNATIVE TITLES
+%\title{Revenue Maximization in Social Advertising with Incentives}
+%\title{Revenue Maximization in Incentivised Social Advertising under Matroid and Submodular Knapsack Constraints}
+% \title{Viral Ad Allocation Under Matroid and Submodular Knapsack Constraints}
+%\title{Revenue Maximization in Social Advertising under Matroid and Submodular Knapsack Constraints}
+% \title{Revenue-Maximizing Allocation of Viral Ads \\ Under Matroid and Submodular Knapsack Constraints}
+% \title{Revenue-Maximizing Viral Ad Allocation under \\ Matroid and Submodular Knapsack Constraints}
+%\title{Revenue Maximization for Social Advertising under Matroid and Submodular Knapsack Constraints}
+%
+%\maketitle
+%\sloppy
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Intro. & Motivation: laks; wei; francesco; cigdem.
+%Problem Statement: wei (done); laks; cigdem; francesco.
+%Hardness and Approximation: laks; wei; francesco; cigdem.
+%Scalable Algorithms: laks; wei; francesco; cigdem.
+%- approx.: CA and CS cases.
+%- heuristics: any?
+%Experiments: wei; cigdem; francesco; laks.
+%Conclusions: laks; francesco; wei; cigdem.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{abstract}
+\input{abstract.tex}
+\end{abstract}
+
+\thispagestyle{empty}
+
+\section{Introduction}
+\label{sec:intro}
+\input{intro.tex}
+
+\vspace{-4mm}
+
+\LL{\section{Problem statement}
+\label{sec:problem}
+}
+\input{problem.tex}
+
+\section{Hardness and Approximation}
+\label{sec:theory}
+\input{theory.tex}
+
+\section{Scalable Algorithms}
+\label{sec:algorithms}
+\input{algorithms.tex}
+
+\section{Experiments}
+\label{sec:experiments}
+\input{experiments.tex}
+
+\section{Related work}
+\label{sec:related}
+\input{related.tex}
+
+\section{Conclusions}
+\label{sec:conclusions}
+\input{conclusions.tex}
+
+\input{staticbib.tex}
+
+%\bibliographystyle{abbrv}
+%\bibliography{propagation}
+
+% this one will be hidden for the paper submission -- but need to be included in the extended version.
+%\section{Appendix}
+%\input{appendix.tex}
+
+\end{document}

@@ -1,0 +1,98 @@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% PART I: Introduce Social Advertising
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+The rise of online advertising platforms has generated new opportunities for advertisers in terms of personalizing and targeting their marketing messages. When users access a platform, they leave a trail of information that can be correlated with their consumption tastes, enabling better targeting options for advertisers. Social networking platforms particularly can gather large amounts of users' shared posts that stretches beyond general demographic and geographic data. This offers more advanced interest, behavioral, and connection-based targeting options, enabling a level of personalization that is not achievable by other online advertising channels. Hence, advertising on social networking platforms has been one of the fastest growing sectors in the online advertising landscape: a market that did not exist until Facebook launched its first advertising service in May $2005$, is projected to generate $\$11$ billion revenue by $2017$, almost doubling the $2013$ revenue\footnote{\scriptsize \url{http://www.unified.com/historyofsocialadvertising/}}.
+
+\spara{Social advertising.} Social advertising models are typically employed by platforms such as Twitter, Tumblr, and Facebook through the implementation of \emph{promoted posts} that are shown in the ``news feed" of their users.\footnote{\scriptsize According to a recent report, Facebook's news feed ads have $21$ times higher click-through rate than standard web retargeting ads and  $49$ times the click-through rate of Facebook's right-hand side display ads: see \url{https://blog.adroll.com/trends/facebook-exchange-news-feed-numbers}.} A promoted post can be a video, an image, or simply a textual post containing an advertising message.
+Social advertising models of this type are usually associated with a \emph{cost per engagement} (CPE) pricing scheme: the advertiser does not pay for the ad impressions, but pays the platform owner (hereafter referred to as the \emph{host}) only when a user actively engages with the ad. The \emph{engagement} can be in the form of a social action such as \emph{``like"}, \emph{``share''}, or \emph{``comment''}: in this paper we blur the distinction between these different types of actions, and generically refer to them all as  \emph{engagements} or \emph{clicks} interchangeably.
+
+Similar to organic (i.e., non-promoted) posts, promoted posts can propagate from user to user in the network\footnote{\scriptsize Tumblr's CEO D. Karp reported (CES 2014) that a normal post is reposted on average 14 times, while promoted posts are on average reposted more than 10\,000 times: \url{http://yhoo.it/1vFfIAc}.}, potentially triggering a viral contagion: whenever a user $u$ engages with an ad $i$, the host is paid some fixed amount by the advertiser (the CPE). Furthermore, $u$'s engagement with $i$ appears in the feed of $u$'s followers, who are then exposed to ad $i$ and could in turn be influenced to engage with $i$, producing further revenue for the host~\cite{bakshy12,tucker12}.
+
+%Sometimes social networking platforms supplement the ads with \emph{social proofs} such as \emph{``X, Y, and 3 other friends liked it''}, which may further increase the chance that a user will click, providing even greater potential for viral propagation.
+
+%While social network advertising provides more advanced targeting options that translate to higher click-through-probabilities compared to a standard display ad, issues such as ``ad fraud", ``ad fatigue", and viewability by ``real" users, have made it harder for the advertisers to get a real response from their audience. Hence, a new form of advertising, usually referred as \emph{incentive-based} advertising in the marketing industry, is gaining more and more acceptance among the marketers: this form of advertising offers a quick and tangible payment for a user's time in exchange for their engagement to ads, and helps the advertisers to draw users' real attention by respecting their time commitment through the value-exchange approach.
+
+
+
+\enlargethispage{2\baselineskip}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% PART II: Introduce Incentivized Social Advertising
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\spara{Incentivized social advertising.} In this paper, we study the novel model of \emph{incentivized social advertising}. Under this model, users selected by the host as  \emph{seeds} for the campaign on a specific ad $i$, can take a ``cut'' on the social advertising revenue. These users are typically selected because they are influential or authoritative on the specific topic, brand, or market of $i$.
+
+A recent report\footnote{\scriptsize \url{http://www.theverge.com/2016/4/19/11455840/facebook-tip-jar-partner-program-monetization}} indicates that Facebook is experimenting with the idea of incentivizing users. YouTube launched a revenue-sharing program for prominent users in 2007. Twitch, the streaming platform of choice for gamers, lets partners make money through revenue sharing, subscriptions, and merchandise sales. YouNow, a streaming platform popular among younger users, earns money by taking a cut of the tips and digital gifts that fans give its stars. On platforms without partner deals, including Twitter and Snapchat, celebrity users often strike sponsored deals to include brands in their posts, which suggests potential monetization opportunities for Twitter and Snapchat\footnote{\scriptsize \url{http://www.wsj.com/articles/more-marketers-offer-incentives-for-watching-ads-1451991600}}.
+
+%\note[Laks]{Removed proportionality and changed it to ``a function of''.}
+
+%In particular,
+In this work, we consider incentives that are
+%\emph{ proportional to the topical influence}
+determined by the topical influence of the seed users for the specific ad. More concretely, given an ad $i$, the financial incentive that a seed user $u$ would get for engaging with $i$ is a function of the social influence that $u$ has exhibited in the past in the topic of $i$. For instance, a user who  often produces relevant content about long-distance running, capturing the attention of a relatively large audience, might be a good seed for endorsing a new model of running shoes. In this case, her past demonstrated influence on this very topic would be taken into consideration when defining the lumpsum amount for her engagement with the new model of running shoes. The same user could be considered as a seed for a new model of tennis shoes, but in that case the incentive might be lower, due to her lower past influence demonstrated. To summarize, incentives are paid by the host to users selected as seeds. These incentives count as seeding costs and depend on the topic of the ad and the user's past demonstrated influence in the topic.
+
+The incentive model above has several advantages. First, it captures in a uniform framework both the ``celebrity-influencer", whose incentives are naturally very high (like her social influence), and who are typically preferred by more traditional types of advertising such as TV ads; as well as the ``ordinary-influencer''~\cite{bakshy2011}, a non-celebrity individual who is an expert in some specific topic, and thus has a relatively restricted audience, or tribe, that trust her. Second, incentives not only play their main role, i.e., encourage the seed users to endorse an advert campaign, but also, as a by-product, they incentivize users of the social media platform to become  influential in some topics by actively producing \emph{good-quality content}.  This has an obvious direct benefit for the social media platform.
+
+%\note[Cigdem]{There is this paper titled: "Optimizing Budget Allocation among Channels and Influencers".
+%\url{https://pdfs.semanticscholar.org/bc06/e8d0f29a84abdeb0322b7268b3a17b23a187.pdf}
+%In the first page, there is a sentence that says something like "amount of budget allocated to an individual determines her level of effort and success in influencing her direct friends". Can someone check this paper, maybe we can relate it to our "incentives proportional to demonstrated past influence"  thing. They are kind of like yin-yang. Having said this, can someone please make sure to emphasize that our theory does not depend on how the seed user incentives are assigned!}
+
+%\note[Laks]{I think what we study is profit maximization, not revenue maximization. See my comments in the email. But I am OK leaving it as RM if that's what the majority feels. I can fix the presentation to suit either choice. :-) }
+
+\enlargethispage{\baselineskip}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% PART III: The Problem Studied
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\spara{Revenue maximization.} In the context of incentivized social advertising, we study the fundamental problem of revenue maximization from the host perspective: an advertiser enters into an agreement with the host to pay, following the CPE model, a fixed price $\cpe{i}$ for each engagement with ad $i$. The agreement also specifies the finite budget $B_i$ of the advertiser for the campaign for ad $i$. The host has to carefully select the seed users for the campaign: given the maximum amount $B_i$ that it can receive from the advertiser, the host must try to achieve as many engagements on the ad $i$ as possible, while spending as little as possible on the incentives for ``seed'' users. The host's task gets even more challenging by having to simultaneously accommodate multiple  campaigns by different advertisers. Moreover, for a fixed time window (e.g., 1 day, or 1 week), the host can select each user as the seed endorser for at most one ad: this constraint maintains higher credibility for the endorsements and avoids the undesirable situation where, e.g., the same sport celebrity endorses Nike and Adidas in the same time window. Therefore two ads $i$ and $j$, which are in the same topical area, naturally compete for the influential users in that area.
+
+We show that, taking all important factors (such as topical relevance of ads, their propensity for social propagation, the topical influence of users, seed  incentives and advertiser budgets) into account, the problem of revenue maximization in incentivized social advertising corresponds to the problem of \emph{monotone submodular function maximization subject to a partition matroid constraint on the ads-to-seeds allocation, and submodular knapsack constraints on the advertisers' budgets}. This problem is NP-hard and furthermore is far more challenging than the classical influence maximization problem (IM) \cite{kempe03}  and its variants.
+For this problem, we develop two natural greedy algorithms, for which we provide formal approximation guarantees. The two algorithms differ in their sensitivity to cost-effectiveness in the seed user selection:
+\squishlist
+  \item \emph{Cost-Agnostic Greedy Algorithm} (\CARM), which greedily chooses the seed users based on the marginal gain in the revenue, without using any information about the users' incentive costs;
+  \item \emph{Cost-Sensitive Greedy Algorithm} (\CSRM), which greedily chooses the seed users based on the \emph{rate} of marginal gain in revenue per marginal gain in the advertiser's payment for each advertiser.
+\squishend
+
+%\note[Cigdem]{Following Wei's suggestion, we are now using "cost-effectiveness" to differentiate between the $2$ greedy algorithms, it provides cleaner differentiation.}
+
+ %For this problem, we develop two natural greedy algorithms for which we provide formal approximation guarantees. The two algorithms differ in their sensitivity to advertisers' payment functions:
+%\begin{enumerate}
+%  \item  \emph{Cost-Agnostic Greedy Algorithm} (\CARM), which greedily chooses the seed users solely based on the marginal gain in the revenue until the advertisers' budgets run out;
+%  \item \emph{Cost-Sensitive Greedy Algorithm} (\CSRM), which greedily chooses the users based on the \emph{rate} of marginal gain in revenue per marginal gain in the advertiser's payment, for each advertiser, until the advertisers' budgets run out.
+%\end{enumerate}
+
+Our results generalize the results of Iyer \emph{et al.}~\cite{iyer2013submodular, iyer2015submodularthesis} on submodular function maximization by $(i)$ generalizing from
+a single submodular knapsack constraint to multiple submodular knapsack constraints, and $(ii)$ by handling an additional partition matroid constraint.
+Our theoretical analysis leverages the notion of curvature of submodular functions.
+%\todo[Francesco]{Here we describe how we obtain the scalable practical %algorithms: what are the technical challenges and the contributions.}
+%\note[Laks]{Some generic statement about how the CA and CS approx. guarantees compare with each other.
+%
+%Also, should we discuss our PVLDB 2015 paper here and how our work differs from that?}
+%\note[Francesco]{We discuss how we differ from PVLDB15 in the Related Work.}
+
+%\note[Cigdem]{I will address CA and CS approx. guarantees comparison soon.}
+
+Our approximation algorithms require repeatedly estimating the expected marginal gain in revenue as well in advertiser payment.
+%In order to implement these operations efficiently, we exploit a connection to
+We leverage recent advances in scalable estimation of expected influence spread and devise scalable algorithms for revenue maximization in our model.
+
+\enlargethispage{\baselineskip}
+\spara{Contributions and roadmap.}
+%The main contributions of this paper are as follows:
+\squishlist
+\item We propose \emph{incentivized} social advertising, and formulate a fundamental problem of revenue maximization from the host perspective, when the incentives paid to the seed users are determined by their demonstrated past influence in the topic of the specific ad (Section~\ref{sec:problem}).
+
+\eat{
+\note[Cigdem]{do we need to say above that the incentives are proportional to past influence? Our theory and algorithms are generic, they do not use any information regarding being "proportional" to past influence, so they are applicable to any kind of cost or payment function (as long as payment function is submodular.)}
+}
+
+\item We prove the hardness of our problem and we devise two greedy algorithms with approximation guarantees. The first (\CARM) is agnostic to users' incentives during the seed selection while the other (\CSRM) is not (Section~\ref{sec:theory}). %generalizing the results of Iyer \emph{et al.}~\cite{iyer2013submodular, iyer2015submodularthesis}.
+
+\item We devise scalable versions of our approximation algorithms (Section~\ref{sec:algorithms}). Our comprehensive experimentation on real-world datasets (Section~\ref{sec:experiments}) confirms the scalability of our methods and shows that the scalable version of \CSRM consistently outperforms that of \CARM, and is far superior to natural baselines, thanks to a mindful allocation of budget on incentives. 
+%thanks to a mindful allocation of budget on incentives.
+
+\squishend
+Related work is discussed in Section~\ref{sec:related} while Section~\ref{sec:conclusions} concludes the paper discussing future work.
+%Some proofs are omitted here for brevity and can be found in \cite{us-arxiv}.
+
+
+
+

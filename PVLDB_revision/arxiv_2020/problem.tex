@@ -1,0 +1,77 @@
+%We first introduce the data model and the business model, and then define the revenue maximization problem.
+%In this section, we describe the problem setting and formally define the revenue maximization problem.
+
+\spara{Business model: the advertiser.} An \emph{advertiser}\footnote{\scriptsize We assume each advertiser has one ad to promote per time window, and use $i$ to refer to the $i$-th advertiser and its ad interchangeably.} $i$ enters into an agreement with the \emph{host}, the owner of the social networking platform, for an incentivized social advertising campaign on its ad. The advertiser agrees to pay the host:
+\squishdesc
+\item[1.] an incentive $c_i(u)$ for each seed user $u$ chosen to endorse ad $i$; we let $S_i$ denote the set of users selected to endorse ad $i$;
+\item[2.] a cost-per-engagement amount $\cpe{i}$ for each user that engages with (e.g., clicks) its ad $i$.
+\squishend
+An advertiser $i$ has a finite budget $B_i$ that limits the amount it can spend on the campaign for its ad.
+%
+\eat{
+Let $\sigma_i(S_i)$ denote the \emph{number of clicks} received by the ad $i$, when using $S_i$ as the seed set of incentivized users.
+The total payment advertiser $i$ needs to make for its campaign, denoted  $\rho_i(S_i)$, is the sum of its total costs for the ad-engagements (e.g., clicks), and for incentivizing its seed users: i.e., $\rho_i(S_i) = \pi_i(S_i) + c_i(S_i)$ where $\pi_i(S_i) = \cpe{i} \cdot \sigma_i(S_i)$ and $c_i(S_i) := \sum_{u \in S_i} c_i(u)$. }
+%
+
+\spara{Business model: the host.} %\enlargethispage{\baselineskip}
+The host receives from advertiser $i$:
+
+\squishdesc
+\item[1.] a description of the ad $i$ (e.g., a set of keywords) which allows the host to map the ad to a distribution $\vec{\gamma_i}$ over a latent topic space (described in more detail later);
+\item[2.] a commercial agreement that specifies the cost-per-engagement amount $\cpe{i}$ and the campaign budget $B_i$.
+\squishend
+
+The host is in charge of running the campaign, by selecting which users and how many to allocate as a seed set $S_i$ for each ad $i$, and by determining their incentives.
+Given that these decisions must be taken \emph{before} the campaign is started, the host has to reason in terms of \emph{expectations} based on past performance.
+Let $\sigma_i(S_i)$ denote the \emph{expected number of clicks} ad $i$ receives when using $S_i$ as the seed set of incentivized users. The host models
+the total payment that advertiser $i$ needs to make for its campaign, denoted  $\rho_i(S_i)$, as the sum of its total costs for the \emph{expected}  ad-engagements (e.g., clicks), and for incentivizing its seed users: i.e., $\rho_i(S_i) = \pi_i(S_i) + c_i(S_i)$ where $\pi_i(S_i) = \cpe{i} \cdot \sigma_i(S_i)$ and $c_i(S_i) := \sum_{u \in S_i} c_i(u)$, where $c_i(u)$ denotes the incentive paid to a candidate seed user $u$ for ad $i$.
+%
+%Thus, from the host perspective,  $\sigma_i(S_i)$ denotes the \emph{expected number of clicks} that the ad $i$ will get, when using $S_i$ as the seed set.
+We assume $c_i(u)$ is a monotone function $f$ of the influence potential of $u$, capturing the intuition that seeds with higher expected spread cost more: i.e., $c_i(u) := f(\sigma_i(\{u\}))$.
+
+Notice that the expected revenue of the host from the engagements to ad $i$ is just  $\pi_i(S_i)$, as the cost $c_i(S_i)$ paid by the advertiser to the host for the incentivizing influential users, is in turn paid by the host to the seeds.
+In this setting, the host faces the following trade-off in trying to maximize its revenue. Intuitively, targeting influential seeds would increase the expected number of clicks, which in turn could yield a higher revenue. However, influential seeds cost more to incentivize. Since the advertiser has a fixed overall budget for its campaign, the higher seeding cost may come at the expense of reduced revenue for the host.
+Finally, an added challenge is that the host has to serve many advertisers at the same time, with potentially competitive ads, i.e., ads which are very close in the topic space.
+
+\spara{Data model, topic model, and propagation model.} The host, owns:
+a \emph{directed graph} $G=(V,E)$ representing the social network, where an arc $(u,v)$ means that user $v$ follows user $u$, and thus $v$ can see $u$'s posts and may be influenced by $u$. The host also owns a \emph{topic model} for ads and users' interests, defined  by a hidden variable $Z$ that can range over $L$ latent topics. A topic distribution thus abstracts the interest pattern of a user and the relevance of an ad to those interests. More precisely, the topic model  maps each ad $i$ to a distribution $\vec{\gamma_i}$ over the latent topic space:
+$$\gamma_i^z = \Pr(Z=z|i), \mbox{ with } \sum_{z = 1}^L\gamma_i^z = 1.$$
+
+Finally, the host uses a topic-aware influence propagation model defined on the social graph $G$ and the topic model.
+The propagation model governs the way in which ad impressions propagate in the social network, driven by topic-specific influence.
+In this work, we adopt the \emph{Topic-aware Independent Cascade} model\footnote{\scriptsize
+Note that the use of the topic-based model is orthogonal to the technical development and contributions of our work. Specifically, if we assume that the topic distributions of all ads and users are identical, the TIC model reduces to the standard IC model. The techniques and results in the paper remain intact.
+} (TIC) proposed by Barbieri et al.~\cite{BarbieriBM12} which extends the standard \emph{Independent Cascade} (IC) model~\cite{kempe03}: In TIC, an ad is represented by a topic distribution, and the influence strength from user $u$ to $v$ is also topic-dependent, i.e., there is a probability $p_{u,v}^z$ for each topic $z$.
+In this model, when a node $u$ clicks an ad $i$, it gets one chance of influencing each of its out-neighbors $v$ that has not clicked $i$. This event succeeds with a probability equal to the weighted average of the arc probabilities w.r.t.\ the topic distribution of ad $i$:
+\begin{equation}\label{eq:tic}
+	p^i_{u,v} = \sum\nolimits_{z = 1}^L\gamma_i^z \cdot p_{u,v}^z.
+\end{equation}
+Using this stochastic propagation model the host can determine the \emph{expected spread} $\sigma_i(S_i)$ of a given campaign for ad $i$ when using $S_i$ as seed set.
+For instance, the influence value of a user $u$ for ad $i$ is defined as the expected spread of the singleton seed $\{u\}$ for the given the description for ad $i$,  under the TIC model, i.e., $\sigma_i(\{u\})$: this is the quantity that is used to determine the incentive for a candidate seed user $u$ to endorse the ad $i$.
+
+
+\spara{The revenue maximization problem.}
+Hereafter we assume a fixed time window (say a 24-hour period) in which the revenue maximization problem is defined.
+Within this time window we have $h$ advertisers with ad description  $\vec{\gamma_i}$, cost-per-engagement $\cpe{i}$, and budget $B_i$, $i \in [h]$. We define an \emph{allocation} $\vecall$ as a vector of $h$ \emph{pairwise disjoint} sets $(S_1, \cdots, S_h) \in 2^V \times \cdots \times 2^V$, where $S_i$ is the seed set assigned to advertiser $i$ to start the ad-engagement propagation process. Within the time window, each user in the platform can be selected to be seed for at most one ad, that is, $S_i \cap S_j = \emptyset$, $i,j \in [h]$. We denote the total revenue of the host from advertisers as the sum of the  ad-specific revenues:
+$$
+ \pi(\vecall) =  \sum_{i \in [h]} \pi_i(S_i).
+$$
+
+\noindent Next, we formally define the revenue maximization problem for incentivized social advertising from the host perspective. Note that given an instance of the TIC model on a social graph $G$, for each ad $i$, the ad-specific influence probabilities are determined by Eq.~(\ref{eq:tic}).
+
+\begin{problem}[\RMLong(\RM)]\label{pr:revMax}
+Given a social graph $G=(V,E)$, $h$ advertisers, cost-per-engagement $\cpe{i}$ and budget $B_i$, $i \in [h]$, ad-specific influence probabilities $p^i_{u,v}$  and seed user incentive costs $c_i(u)$, $u, v\in V$, $i \in [h]$, find a feasible allocation $\vecall$ that maximizes the host's revenue:
+\begin{equation*}
+\begin{aligned}
+& \underset{\vecall}{\text{\em maximize}}
+& & \pi(\vecall) \\
+& \text{\em subject to}
+& & \rho_i(S_i) \le B_i, \forall i \in [h],  \\
+&&& S_i \cap S_j = \emptyset , i \neq j, \forall i,j \in [h].
+\end{aligned}
+\end{equation*}
+\end{problem}
+
+In order to avoid degenerate problem instances, we assume that no single user incentive 
+exceeds any advertiser's budget.
+This ensures that every advertiser can afford at least one seed node.

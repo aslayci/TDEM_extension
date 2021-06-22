@@ -1,0 +1,12 @@
+\BOOKMARK [1][-]{section.1}{Introduction}{}% 1
+\BOOKMARK [1][-]{section.2}{Problem statement}{}% 2
+\BOOKMARK [1][-]{section.3}{Hardness and Approximation}{}% 3
+\BOOKMARK [2][-]{subsection.3.1}{Cost-Agnostic Greedy Algorithm}{section.3}% 4
+\BOOKMARK [2][-]{subsection.3.2}{Cost-Sensitive Greedy Algorithm}{section.3}% 5
+\BOOKMARK [1][-]{section.4}{Scalable Algorithms}{}% 6
+\BOOKMARK [2][-]{subsection.4.1}{Scalable Influence Spread Estimation}{section.4}% 7
+\BOOKMARK [2][-]{subsection.4.2}{Scalable Revenue Maximization}{section.4}% 8
+\BOOKMARK [1][-]{section.5}{Experiments}{}% 9
+\BOOKMARK [1][-]{section.6}{Related work}{}% 10
+\BOOKMARK [1][-]{section.7}{Conclusions}{}% 11
+\BOOKMARK [1][-]{section.8}{References}{}% 12

@@ -1,0 +1,118 @@
+%\begin{minipage}{\textwidth}
+
+\IncMargin{1em}
+\begin{algorithm}[t!]
+\caption{\fastcs}
+\label{alg:fastCS}
+\Indm
+{\small
+\SetKwInOut{Input}{Input}
+\SetKwInOut{Output}{Output}
+\SetKwComment{tcp}{//}{}
+\Input{$G=(V,E)$, $B_i$, $\cpe{i}$, $\vec{\gamma}_i, \forall i \in [h]$, $c_i(u), \forall i \in [h], \forall u \in V$}
+ \Output{\CN{$\vecstilde = (\stilde_1, \ldots, \stilde_h)$}}
+}
+\Indp
+{\small
+\ForEach{$j = 1, 2, \ldots, h$} {
+$\CN{\stilde_j} \gets \emptyset$; $Q_j \gets \emptyset$; \tcp{\small a priority queue}
+\CN{$\tilde{s}_j \gets 1$}; $\theta_j \gets L_{\CC{j}}(\CN{\tilde{s}_j}, \varepsilon)$; $\RR_j \gets \mathsf{Sample}(G, \gamma_j,\theta_j)$\;
+\CN{$\sib{j} \gets \left\lceil \frac{B_j}{\srho^j_{min} + \cpe{j} \cdot \frac{\varepsilon}{2} \cdot \etb{j}{\tilde{s}_j}} \right\rceil$}\;
+\CN{$\rbudget{j} \gets B_j -  \cpe{i} \cdot \frac{\varepsilon}{2} \cdot \CC{\etb{j}{\tilde{s}_j}}$}\;
+$\text{assigned}[u] \leftarrow \text{false}, \forall u \in V$\;
+}
+\BlankLine
+\While{true} {
+  \ForEach{$j = 1, 2, \ldots, h$} {
+  	  $(v_j, cov_j(v_j)) \gets \mathsf{SelectBestCSNode}(\RR_j)$ (Alg~\ref{alg:rrBestCSNode}) \label{line:greedySelectBest}
+ 	  $F_{\RR_j}(v_j) \gets cov_j(v_j) / \theta_j $\;
+     $\CN{\spi_j(\stilde_j \cup \{v_j\}) \gets \spi_j(\stilde_j) + \cpe{j} \cdot n \cdot F_{\RR_j}(v_j)}$\; 	
+  }
+  $i \gets \argmax_{j=1}^h \dfrac{\spi_j(v_j | \stilde_j)}{\srho_j(v_j | \stilde_j)}$ subject to: $\srho_j(\stilde_j \cup \{v_j\}) \le \CN{\rbudget{j}} \; \wedge \; \text{assigned}[v_j] = \text{false} $ \; \label{line:greedyCriterCS}
+\If{$i \neq \mathbf{NULL}$} {
+	$\stilde_i \gets \stilde_i \cup \{v_i\}$\;
+	$\text{assigned}[v_i] = \text{true}$\;
+         $Q_i.\mathsf{insert}(v_i, cov_i(v_i)) $\;
+	$\RR_i \gets \RR_i \setminus \{R \mid v_i \in R \; \wedge \; R \in \RR_i\} $;
+}
+//{\tt remove RR-sets that are covered}\;
+\lElse {
+	{\bf return} //{\tt all advertisers exhausted;}
+}
+\If{$ \left\vert{\stilde_i}\right\vert = \tilde{s}_i$} {
+	\CN{$\tilde{s}_i \gets \tilde{s}_i + \left\lfloor \frac{\rbudget{i}  - \srho_i(\stilde_i)}{c_i^{max} + \cpe{i} \cdot (n \cdot F_{\RR_i}^{max} + \frac{\varepsilon}{2} \cdot \etb{i}{\tilde{s}_i})} \right\rfloor$}\;
+	%$\tilde{s}_i \gets \tilde{s}_i + \lfloor  (\rbudget{i}  - \srho_i(\stilde_i)) / (c_i^{max} + \cpe{i} \cdot (n \cdot F_{\RR_i}^{max} + \frac{\varepsilon}{2} \cdot \eta_i^t)) \rfloor$\;
+  	$\RR_i \gets \RR_i \cup \mathsf{Sample}(G, \gamma_i, \max\{0, L_{\CC{i}}(\tilde{s}_i,\varepsilon) - \theta_i \}$\; 	
+  	\CC{$\theta_i \gets \max\{L_{\CC{i}}(\CN{\sib{i}}, \tilde{s}_i,\varepsilon), \theta_{i}\}$}\;
+  	$\spi_i(\stilde_i) \gets$ $\mathsf{UpdateEstimates}$($\RR_i$, $\theta_i$, $\stilde_i$, $Q_i$)\;
+  	\CN{$\rbudget{i} \gets B_i -  \cpe{i} \cdot \frac{\varepsilon}{2} \cdot \CC{\etb{i}{\tilde{s}_i}}$}\;
+//{\tt revise estimates to reflect newly added RR-sets}\;
+  	$\srho_i(\stilde_i) \gets$ $\spi_i(\stilde_i) + c_i(\stilde_i)$;
+}
+}
+}
+\end{algorithm}
+
+
+\begin{algorithm}[t!]
+\caption{UpdateEstimates($\RR_i$, $\theta_i$, $\stilde_i$, $Q_i$)}
+\label{alg:rrUpdateEst}
+\Indm
+{\small
+\SetKwInOut{Input}{Input}
+\SetKwInOut{Output}{Output}
+\SetKwComment{tcp}{//}{}
+\Output{$\spi_i(\stilde_i)$}
+}
+\Indp
+{ \small
+$\spi_i(\stilde_i) \gets 0 $ \;
+\For{$j = 0, \ldots, |\stilde_i| -1$} {
+	$(v,cov_i(v)) \gets Q_i[j] $ \;
+	$cov_i'(v) \gets \left\vert{\{R \mid v \in R, R \in \RR_i\}}\right\vert $\;
+	$Q_i.\mathsf{insert}(v, cov_i(v) + cov_i'(v))$\;
+	$\spi_i(\stilde_i) \gets \cpe{i} \cdot n \cdot ((cov_i(v) + cov_i'(v)) / \theta_i) $; //{\tt update coverage of existing seeds w.r.t. new RR-sets added to collection.}
+}
+}
+\end{algorithm}
+
+\begin{algorithm}[t!]
+\caption{SelectBestCANode($\RR_j$)}
+\label{alg:rrBestCANode}
+\Indm
+{\small
+\SetKwInOut{Input}{Input}
+\SetKwInOut{Output}{Output}
+\SetKwComment{tcp}{//}{}
+\Output{$(u, cov_j(u))$}
+}
+\Indp
+{ \small
+    $u \gets \argmax_{v\in V} |{\{R \mid v \in R \; \wedge \; R \in \RR_j\}}| $
+\hspace*{12ex} subject to: $\text{assigned}[v] = \text{false}$\; \label{algo-selectCA:line1}
+    $cov_j(u) \gets |{\{R \mid u \in R \; \wedge \; R \in \RR_j\}}| $;
+//{\tt find best cost-agnostic seed for ad $j$ as well as its coverage.}
+}
+\end{algorithm}
+
+
+
+\begin{algorithm}[t!]
+\caption{SelectBestCSNode($\RR_j$)}
+\label{alg:rrBestCSNode}
+\Indm
+{\small
+\SetKwInOut{Input}{Input}
+\SetKwInOut{Output}{Output}
+\SetKwComment{tcp}{//}{}
+\Output{$(u, cov_j(u))$}
+}
+\Indp
+{ \small
+    $u \gets \argmax_{v\in V} \dfrac{|{\{R \mid v \in R \; \wedge \; R \in \RR_j\}}|}{c_j(v)} $
+\hspace*{12ex} subject to: $\text{assigned}[v] = \text{false}$\; \label{algo-selectCS:line1}
+    $cov_j(u) \gets |{\{R \mid u \in R \; \wedge \; R \in \RR_j\}}| $;
+//{\tt find best cost-sensitive seed for ad $j$ as well as its coverage.}
+}
+\end{algorithm}
+\DecMargin{1em}

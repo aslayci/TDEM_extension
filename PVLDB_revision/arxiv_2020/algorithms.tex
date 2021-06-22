@@ -1,0 +1,272 @@
+%Cohen et al.~\cite{cohen14} proposed a sketch-based design for the fast computation of influence spread, achieving efficiency and effectiveness comparable to TIM.
+While Algorithms \CARM and \CSRM provide approximation guarantees, their efficient implementation is a challenge, as both of them require a large number of influence spread computations: in each iteration $t$, for each advertiser $i$ and each node $u \in V \setminus S^{t-1}_i$, the algorithms need to compute $\pi_i(u \mid S^{t-1}_i)$ and $\pi_i(u \mid S^{t-1}_i) / \rho_i(u \mid S^{t-1}_i)$, respectively.
+
+Computing the exact influence spread $\sigma(S)$ of a given seed set $S$ under the IC model is \SPhard~\cite{ChenWW10}, and this hardness carries over to the TIC model. In recent years, significant advances have been made in efficiently estimating $\sigma(S)$. A natural question is whether they can be adapted to our setting, an issue we address next.
+
+\eat{A common practice is to use Monte Carlo (MC) simulations~\cite{kempe03}.
+However, accurate estimation requires a large number of MC simulations, which is prohibitively expensive and will not scale.
+Thus, to make \CARM and \CSRM scalable, we need an alternative approach.}
+
+\subsection{Scalable Influence Spread Estimation}
+\eat{
+In the influence maximization literature, considerable effort has been devoted to developing scalable approximation algorithms.
+Recently, Borgs et al.~\cite{borgs14} %made a theoretical breakthrough by
+introduced the idea of sampling \emph{``reverse-reachable''} (RR) sets in the graph for the efficient estimation of influence spread, and proposed a quasi-linear time randomized algorithm.}
+
+Tang et al.~\cite{tang14} %improved it to
+proposed a near-linear time randomized algorithm for influence maximization, called {\em Two-phase Influence Maximization (TIM)}, building on the notion of \emph{``reverse-reachable''} (RR) sets proposed by Borgs et al.~\cite{borgs14}. Random RR-sets are critical in the efficient estimation of influence spread.
+Tang et al.~\cite{tang2015influence} subsequently proposed an algorithm called IMM that improves upon TIM by tightening the lower bound on the number of random RR-sets required to estimate influence with high probability. The difference between TIM and IMM is that the lower bound used by TIM ensures that the number of random RR-sets it uses is sufficient to estimate the spread of \emph{any} seed set of a given size $s$. By contrast, IMM uses a lower bound that is tailored for the seed that is greedily selected by the algorithm. Nguyen et al.~\cite{NguyenTD16}, adapting ideas from TIM~\cite{tang14}, and the sequential sampling design proposed by Dagum \emph{et al.}~\cite{dagum2000optimal}, proposed an algorithm called SSA that provides significant run-time improvement over TIM and IMM.
+
+These algorithms are designed for the basic influence maximization problem and hence require knowing the number of seeds as input. In our problem, the number of seeds is not fixed, but is dynamic and depends on the budget and partition matroid constraints. Thus a direct application of these algorithms is not possible.
+
+Aslay et al.~\cite{AslayLB0L15} recently proposed a technique for efficient seed selection for IM when the number of seeds required is not predetermined but can change dynamically. \CA{However, their technique cannot handle the presence of seed user incentives which, in our setting, directly affects the number of seeds required to solve the RM problem}. In this section, we derive inspiration from their technique. First, though we note that for \CARM, in each iteration, for each advertiser, we need to find a feasible node that yields the maximum marginal gain in revenue, and hence the maximum marginal spread. By contrast, in \CSRM, we need to find the node that yields the maximum \emph{rate} of marginal revenue per marginal gain in payment, i.e., $\pi_i(u \mid S_i^{t-1}) / \rho_i(u \mid S_i^{t-1})$.
+
+To find such node $u_i^{t}$
+we must compute $\sigma_i(v | S^{t-1}_i)$, $\forall v : (v,i) \in \mathcal{E}^{t-1}$: notice that node $u_i^{t}$ might even correspond to the node that has the \emph{minimum} marginal gain in influence spread for iteration $t$.
+{\sl Thus, any scalable realization of \CSRM should be capable of working as an influence spread oracle that can efficiently compute} $\pi_i(u \mid S_i^{t-1}) / \rho_i(u \mid S_i^{t-1})$ {\sl for all} $u \in \{v : (v,i) \in \mathcal{E}^{t-1}\}$.
+
+Among the state-of-the-art IM algorithms~\cite{tang14, tang2015influence, NguyenTD16}, only TIM~\cite{tang14} can be adapted to serve as an influence oracle. For a given set size $s$, the derivation of the number of random RR-sets that TIM uses is done such that the influence spread of {\sl any set of at most $s$ nodes can be accurately estimated}.
+On the other hand, even though IMM~\cite{tang2015influence} and SSA~\cite{NguyenTD16} provide significant run-time improvements over TIM, they inherently cannot perform this estimation task accurately: the sizes of the random RR-sets sample that these algorithms use are tuned just for accurately estimating the influence spread of \emph{only} the approximate greedy solutions; the sample sizes used are inadequate for estimating the spread of arbitrary seed sets of a given size. Thus, we choose to extend TIM to devise scalable realizations of \CARM and \CSRM, namely, \fastca and \fastcs. Next, we describe how to extend the ideas of RR-sets sampling and TIM's sample size determination technique to obtain scalable approximation algorithms for the RM problem: \fastca  and \fastcs.
+
+\enlargethispage{\baselineskip}
+\CA{\subsection{Scalable Revenue Maximization}}
+For the scalable estimation of influence spread, in this section we devise \fastca and \fastcs, scalable realizations of \CARM and \CSRM, based on the notion of Reverse-Reachable sets~\cite{borgs14} and adapt the sample size determination procedure employed by TIM~\cite{tang14} to achieve a certain estimation accuracy with high confidence.
+
+\spara{Reverse-Reachable (RR) sets~\cite{borgs14}.} Under the IC model, a random RR-set $R$ from $G$ is generated as follows. First, for every edge $(u,v) \in E$, remove it from $G$ w.p.\ $1-p_{u,v}$: this generates a possible world (deterministic graph) $X$. Second, pick a \emph{target} node $w$ uniformly at random from $V$. Then, $R$ consists of the nodes that can reach $w$ in $X$. For a sufficient sample $\RR$ of random RR-sets, the fraction $F_{\RR}(S)$ of $\RR$ covered by $S$ is an unbiased estimator of $\sigma(S)$, i.e., $\sigma(S) = \E[ n \cdot F_\RR(S)]$.
+
+\spara{Sample Size Determination of \CC{TIM}~\cite{tang14}.} \CC{Let $\CN{\RR_i}$ be a collection of $\theta_i$ random RR-sets. Given any seed set size $s_i$ and $\varepsilon > 0$, define $\CC{L_{i}(s_i,\varepsilon)}$ to be:}
+\begin{align}\label{eqn:timLB}
+\CC{L_{i}(s_i,\varepsilon)} = (8 + 2 \varepsilon) n \cdot \dfrac{\ell \log n + \log \binom{n}{\CN{s_i}} + \log 2}{\CC{OPT_{i,s_i}} \cdot \varepsilon^{2}},
+\end{align}
+where $\ell > 0, \varepsilon > 0$ and \CC{$OPT_{i,s_i} = \underset{S \subseteq V, |S| \le s_i} {\max~} \sigma_i(S)$}. Let $\theta_i$ be a number no less than $\CC{L_{i}(s_i,\varepsilon)}$. Then, for any seed set $S$ with $\CN{|S| \leq s_i}$, the following inequality holds w.p.\ at least $1 - n^{- \ell} / \binom{n}{\CN{s_i}}$:
+\CN{
+\begin{align}
+\label{eq:Lemma3}
+\left| n \cdot F_{\RR_i}(S_i) - \sigma_i(S_i) \right| < \dfrac{\varepsilon}{2} \cdot OPT_{\CC{i,s_i}}.
+\end{align}
+}
+
+%\note[Cigdem]{Notice that I now define \CC{$OPT_{i,s_i} = \underset{S \subseteq V, |S| \le s_i} {\max~} \sigma_i(S)$} because we use TIM  and its lower bounding algorithm so given $s_i$, we lower bound the optimal IM spread for $s_i$ seeds hence use it for the sample size that makes sure Eq.~\ref{eq:Lemma3} holds.}
+
+\CN{
+\spara{Estimated Payments and Budget Feasibility.\footnote{\footnotesize{We would like to thank to Kai Han and Jing Tang for bringing the budget feasibility issue into our attention, which we address in this section.}}} Let $\vecstilde = (\stilde_1, \cdots, \stilde_h)$ denote the approximately greedy solution that \fastca (resp. \fastcs) returns. Since the algorithm operates on the estimation of influence spread, the revenue and payment computed for each advertiser $i$ will also be estimations of the actual revenue and payment for seed set $\stilde_i$. Let $\spi_i(\stilde_i) =  \cpe{i} \cdot n \cdot \isfrac{\stilde_i}$ and $\srho_i(\stilde_i) = c_i(\stilde_i) + \spi_i(\stilde_i)$ denote the estimated revenue and estimated payment for advertiser $i$, respectively. As \fastca (resp. \fastcs) performs budget feasibility check on the estimated payments, it is possible to encounter scenarios in which $\srho_i(\stilde_i) \le B_i$ while $\rho_i(\stilde_i) > B_i$. Thus, to ensure that the approximate greedy allocation results in actual payments that do not violate any budget constraints with high probability, one could consider to use a refined budget $\rbudget{i} < B_i$, for each advertiser $i$, by taking into account the error introduced by spread estimation. Next, we provide details on how to set $\rbudget{i}$ so that $\stilde_i$ is budget feasible with high probability.}
+%w.p. at least $1 - n^{- \ell} / \binom{n}{s_i}$.}
+
+\CN{First, notice that, following Eq.\ref{eq:Lemma3}, we have $\sigma_i(\stilde_i)  \le n \cdot \isfrac{\stilde_i} + \frac{\varepsilon}{2} \cdot OPT_{\CC{i,s_i}}$. Thus, to ensure that $c_i(\stilde_i) + \cpe{i} \cdot \sigma_i(\stilde_i) \le B_i$, w.h.p., we need to have:  
+\begin{align*}
+c_i(\stilde_i) + \cpe{i} \cdot \left(n \cdot \isfrac{\stilde_i} + \frac{\varepsilon}{2} \cdot OPT_{\CC{i,s_i}}\right) \le B_i
+\end{align*}
+which implies that the budget constraint on the estimated payment $\srho_i(\stilde_i)$ should be refined as:
+\begin{align}
+\srho_i(\stilde_i) \le B_i - \cpe{i} \cdot \frac{\varepsilon}{2} \cdot OPT_{\CC{i,s_i}}.
+\end{align}
+While using a refined budget of  $B_i - \cpe{i} \cdot \frac{\varepsilon}{2} \cdot OPT_{\CC{i,s_i}}$ would ensure w.h.p. that $\rho_i(\stilde_i) \le  B_i$, such refinement requires to compute $OPT_{\CC{i,s_i}}$ which is unknown and \NPhard to compute. To circumvent this difficulty, one could consider an upper bound $\CC{\etb{i}{s_i}}$ on $OPT_{\CC{i,s_i}}$ so that 
+\begin{align*}
+\rbudget{i} &= B_i -  \cpe{i} \cdot \frac{\varepsilon}{2} \cdot \CC{\etb{i}{s_i}}\\
+&\le B_i -  \cpe{i} \cdot \frac{\varepsilon}{2} \cdot \CC{OPT_{i,s_i}}. 
+\end{align*}}
+%This way, $\srho_i(\stilde_i) \le \rbudget{i}$ implies $\rho_i(\stilde_i) \le B_i$ w.h.p.
+%This way, w.p.\ at least $1 - n^{- \ell} / \binom{n}{s_i}$, $\srho_i(\stilde_i) \le \rbudget{i}$ implies $\rho_i(\stilde_i) \le B_i$.} 
+
+%\CN{Such an upper bound can be obtained by upper bounding the optimal solution $OPT_{IM_i}$ to IM problem for $s_i$ seeds since, given that $OPT_{IM_i} = \underset{S \subseteq V, |S| = s_i}{\max} \sigma_i(S)$, it always holds that $OPT_{s_i} \le OPT_{IM_i} \le \eta_i$. 
+\CC{Following \cite{tang18}, an upper bound $\CC{\etb{i}{s_i}}$ on $\CC{OPT_{i,s_i}}$ can be obtained as follows.}
+
+\begin{lemma}[Restated from Lemma $4.3$~\cite{tang18}]
+\label{lemma:ubEta}
+Let $\RR_i$ be a sample of $\theta_i$ RR-sets, such that, $\theta_i \ge \CC{L_{i}(s_i,\varepsilon)}$, and let $\CC{\tilde{A}_i} \subseteq V$, $|\CC{\tilde{A}_i}| = s_i$ denote the greedy solution to maximum coverage problem on the sample $\RR_i$. Define $\CC{\etb{i}{s_i}}$ to be:
+\begin{align}\label{eq:imUB}
+\CC{\etb{i}{s_i}} := \left(\sqrt{\frac{\theta_i \cdot \isfrac{\CC{\tilde{A}_i}}}{1 - 1/e} +\frac{\ln{ n^{\ell}}}{2}} + \sqrt{\frac{\ln{n^{\ell}}}{2}} \right)^2 \cdot \frac{n}{\theta_i}
+\end{align}
+%where $a = \ln{\frac{\binom{n}{s_i}}{n^{- \ell}}}$. 
+Then, we have: 
+\CC{\begin{align*}
+\text{Pr}\left[OPT_{i,s_i}  \le \etb{i}{s_i} \right] \ge 1 - n^{\ell}.
+\end{align*}}
+\end{lemma}
+
+\CC{Following Lemma~\ref{lemma:ubEta}, for a given seed set size $s_i$, we can define $\rbudget{i}$ for $i$ as: 
+\begin{align}
+\label{eq:refBudget}
+\rbudget{i} = B_i - \cpe{i} \cdot \frac{\varepsilon}{2} \cdot \etb{i}{s_i}. 
+\end{align}}
+
+\spara{Latent Seed Set Size Estimation.} \CC{The derivation of the sufficient sample size, depicted in Eq.~\ref{eqn:timLB}, requires the number of seeds as input for each $i$, which is not available for \RM problem. Let $s^*_i = |S^*_i|$ denote the true number of seeds that the optimal allocation would assign to $i$. From the advertisers' budgets, there is no obvious way to determine $s^*_i$ for each $i$. This poses a challenge as the required number of RR-sets ($\theta_i$) for advertiser $i$ depends on $s^*_i$.}
+
+\CC{To circumvent this difficulty, one can use a safe upper bound $\sib{i} = \left\lceil \frac{B_i}{\rho^i_{min}} \right\rceil$ on $s^*_i$, where $\rho^i_{min}$ is the minimum singleton payment for $i$ so that, by using a sample of at least $L_{i}(\sib{i},\varepsilon)$ RR-sets, we can quantify how the approximation guarantee of  \fastca (resp, \fastcs) deteriorate from the guarantee of \CARM (resp., \CSRM) as a function of the estimation accuracy that the sample size ensures for all seed sets of size at most $\sib{i}$ (Eq.\ref{eq:Lemma3}). However, when $\rho_{min}$ is very small w.r.t. $B_i$, a direct application of TIM's sample size derivation technique for $\sib{i}$ seeds could result in a large estimation error $\dfrac{\varepsilon}{2} \cdot OPT_{i,{\sib{i}}}$, due to $\sib{i}$ being a very loose upper bound on $s^*_i$. \CN{Such large estimation error could translate to working with a refined budget $\rbudget{i}$ that is very small w.r.t. $B_i$, resulting in greatly under-utilizing the budget for the sake of budget feasibility.} Now, we explain how to derive a sample size that can estimate the spread of any seed set of size at most $\sib{i}$ while using a more stringent estimation error $\dfrac{\varepsilon}{2} \cdot OPT_{i,\tilde{s}_i}$ with $\tilde{s}_i < \sib{i}$, where $\tilde{s}_i$ is the latent seed set size estimation obtained during the execution of \fastca (resp., \fastcs) as we will explain next.} 
+
+%\note[cigdem]{we also need to address how we assign $\sib{i}$ if  we indeed want to compute from minimum payment: because we'd need to use estimated singleton payment for that (unless we set it to $c_{min} + cpe(i)$ which would be worst case). and if we use minimum singleton payment, then we'd  need a sample for that as well. btw I haven't edited the pseudocodes yet -- after realizing the problem of how to set $\sib{i}$ while doing so.}
+
+\CC{\begin{lemma}
+\label{lemma:newSS}
+Let $\CN{\RR_i}$ be a collection of $\theta_i$ random RR-sets. Given $\sib{i}$, $\tilde{s}_i$, and $\varepsilon > 0$, define $\CC{L_{i}(\sib{i}, \tilde{s}_i, \varepsilon)}$ to be:
+\begin{align}\label{eqn:timL2}
+L_{i}(\sib{i}, \tilde{s}_i, \varepsilon) = (8 \lambda  + 2 \varepsilon) n \cdot \dfrac{\ell \log n + \log \binom{n}{\CN{\sib{i}}} + \log 2}{\CC{OPT_{i,\tilde{s}_i}} \cdot \varepsilon^{2}},
+\end{align}
+where $\ell > 0, \varepsilon > 0$, \CC{$OPT_{i,s} = \underset{S \subseteq V, |S| \le s} {\max~} \sigma_i(S)$}, for any integer $s$, and $\lambda =\frac{OPT_{i, \sib{i}}}{OPT_{i,\tilde{s}_i}}$. Let $\theta_i$ be a number no less than $L_i(\sib{i}, \tilde{s}_i, \varepsilon) $. Then, for any seed set $S$ with $|S| \leq \sib{i}$, the following inequality holds w.p.\ at least $1 - n^{- \ell} / \binom{n}{\sib{i}}$:
+\begin{align}
+\label{eq:newSS}
+\left| n \cdot F_{\RR_i}(S) - \sigma_i(S) \right| < \dfrac{\varepsilon}{2} \cdot OPT_{i,\tilde{s}_i}.
+\end{align}
+\end{lemma}}
+
+\CC{\begin{proof}
+Let $S$ be any seed set of size at most $\sib{i}$ and let $\tau_i$ denote the probability that $S$ overlaps with a random RR set, i.e., 
+$$\tau_i = \E[F_{\RR_i}(S)] = \frac{\sigma_i(S)}{n}.$$
+Then, we have:
+\begin{align}
+\label{eq:newS2}
+& \prob{\left| n \cdot F_{\RR_i}(S) - \sigma_i(S) \right| < \dfrac{\varepsilon}{2} \cdot OPT_{i,\tilde{s}_i}} \nonumber \\
+&= \prob{\left| \theta_i \cdot F_{\RR_i}(S) - \tau_i \theta_i \right| < \dfrac{\varepsilon \theta_i}{2n} \cdot OPT_{i,\tilde{s}_i}} \nonumber \\
+&= \prob{\left| \theta_i \cdot F_{\RR_i}(S) - \tau_i \theta_i \right| < \dfrac{\varepsilon \cdot OPT_{i,\tilde{s}_i}}{2n \tau_i} \cdot \tau_i \theta_i}.
+\end{align}
+Letting $\delta = \dfrac{\varepsilon \cdot OPT_{i,\tilde{s}_i}}{2n \tau_i}$, by Chernoff bounds, we have:
+\begin{align*}
+&\text{r.h.s. of Eq.\ref{eq:newS2} } < 2\exp{\left(- \dfrac{\delta^2}{2+\delta} \cdot \tau_i \theta_i  \right)} \\
+&= 2\exp{\left(- \dfrac{\varepsilon^2 \cdot OPT^2_{i,\tilde{s}_i}}{8n^2\tau_i + 2\varepsilon n \cdot  OPT_{i,\tilde{s}_i}} \cdot \theta_i \right)} \\
+&<  2\exp{\left(- \dfrac{\varepsilon^2 \cdot OPT^2_{i,\tilde{s}_i}}{8n \cdot OPT_{i, \sib{i}} + 2 \varepsilon n \cdot  OPT_{i,\tilde{s}_i}} \cdot \theta_i \right)} \\
+&= 2\exp{\left(- \dfrac{\varepsilon^2 \cdot OPT_{i,\tilde{s}_i}}{8n \cdot \frac{OPT_{i, \sib{i}}}{OPT_{i,\tilde{s}_i}} + 2 \varepsilon n} \cdot \theta_i \right)} 
+\end{align*}
+where the last \emph{inequality} follows from the fact that $\tau_i \le OPT_{i, \sib{i}}$. Finally, we obtain the lower bound on $\theta_i$ by solving 
+\begin{align*}
+2\exp{\left(- \dfrac{\varepsilon^2 \cdot OPT_{i,\tilde{s}_i}}{8n \frac{OPT_{i, \sib{i}}}{OPT_{i,\tilde{s}_i}} + 2 \varepsilon n} \cdot \theta_i \right)}  \le \dfrac{n^{-\ell}}{\binom{n}{\sib{i}}}.
+\end{align*}
+\end{proof}}
+
+\CC{An upper bound on the $\lambda$ term required for the sample size derivation in Eq.~\ref{eqn:timL2} can be obtained by using an upper bound on $OPT_{i, \sib{i}}$, as given by Lemma~\ref{lemma:ubEta}, and  a lower bound on $OPT_{i,\tilde{s}_i}$ by using the lower bounding technique provided in \cite{tang14} for TIM's sample size derivation (Eq.~\ref{eqn:timLB}).}
+
+\eat{We now explain the ``latent seed set size estimation" procedure which first makes an initial guess at $s^*_i$, and then iteratively revises the estimated value, until no more seeds are needed, while concurrently selecting seeds and allocating them to advertisers. For ease of exposition, let us first consider a single advertiser $i$. We start with an initial  estimated value for $s^*_i$, denoted by $\tilde{s}_i^1$, and use it to obtain a corresponding sample size \CN{${\theta}_i^1 = L_{i}(\tilde{s}_i^1,\varepsilon)$ using Eq.~\ref{eqn:timLB}}, an upper bound $\CC{\etb{i}{\tilde{s_i}^1}}$ using Eq.~\ref{eq:imUB}, and a refined budget ${\rbudget{i}}^1$ using Eq.~\ref{eq:refBudget}.}
+
+We now explain the ``latent seed set size estimation" procedure which first makes an initial guess at the true number of seeds required to maximize cost-agnostic (cost-sensitive) revenue and then iteratively revises the estimated value, until no more seeds are needed, while concurrently selecting seeds and allocating them to advertisers. For ease of exposition, let us first consider a single advertiser $i$. We start with an initial  estimate, denoted by $\tilde{s}_i^1$, and use it to obtain a corresponding sample size \CN{${\theta}_i^1 = L_{i}(\tilde{s}_i^1,\varepsilon)$ using Eq.~\ref{eqn:timLB}}, an upper bound $\CC{\etb{i}{\tilde{s_i}^1}}$ using Eq.~\ref{eq:imUB}, and a refined budget ${\rbudget{i}}^1$ using Eq.~\ref{eq:refBudget}. As it is \SPhard to compute $\rho^i_{min}$, we also compute in this iteration a safe upper bound $\sib{i}$ from  $$\sib{i} = \left\lceil \frac{B_i}{\srho^i_{min} + \cpe{i} \cdot \frac{\varepsilon}{2} \cdot \etb{i}{\tilde{s}_i}} \right\rceil$$
+where $\srho^i_{min} = \underset{u \in V}{\min~} c_i(u) + cpe(i) \cdot n \cdot F_{\RR_i}(u)$. \CN{At iteration $t>1$, we compute the sample size from ${\theta}_i^t  = L_{i}(\sib{i}, \tilde{s}_i^1, \varepsilon)$}, and if ${\theta}_i^t > {\theta}_i^{t-1}$, we will need to sample additional $({\theta}_i^t - {\theta}_i^{t-1})$ RR-sets, and use all RR-sets sampled up to this iteration to select $(\tilde{s}_i^t - \tilde{s}_i^{t-1})$ additional seeds \CN{into the seed set $\stilde_i$ of advertiser $i$}, \CC{while revising the upper bound  $\CC{\etb{i}{\tilde{s_i}^t}}$ and the corresponding refined budget $\rbudget{i}^t$}. After adding those seeds, \CN{if the current payment estimate $\srho_i(\stilde_i)$} is still less than $\rbudget{i}^t$, more seeds can be assigned to advertiser $i$. Thus, we will need another iteration and we further revise our estimation of $s^*_i$. The new value, $\tilde{s}_i^{t+1}$, is obtained as follows:
+
+
+%old one
+\eat{The estimation of the latent seed set size required by \fastca and \fastcs can be obtained as follows: for
+ Let $s_i$ be the true number of seeds required to maximize the \eat{ cost-agnostic (cost-sensitive)} revenue for advertiser $i$, i.e., $\CC{s_i = |S^*_i|}$. We do not know $s_i$ and we estimate it in successive iterations as $\tilde{s}_i^t$. \CN{Thus, we start with an initial  estimated value for $s_i$, denoted by $\tilde{s_i}^1$, and use it to obtain a corresponding sample size ${\theta}_i^1$ using Eq.~\ref{eqn:timLB}, an upper bound $\CC{\etb{i}{\tilde{s_i}^1}}$ using Eq.~\ref{eq:imUB}, and a refined budget ${\rbudget{i}}^1$ using Eq.~\ref{eq:refBudget}}. If \CN{at iteration t},  ${\theta}_i^t > {\theta}_i^{t-1}$, we will need to sample additional $({\theta}_i^t - {\theta}_i^{t-1})$ RR-sets, and use all RR-sets sampled up to this iteration to select $(\tilde{s}_i^t - \tilde{s}_i^{t-1})$ additional seeds \CN{into the seed set $\stilde_i$ of advertiser $i$}, \CC{while revising the upper bound  $\CC{\etb{i}{\tilde{s_i}^t}}$ and the corresponding refined budget $\rbudget{i}^t$}. After adding those seeds, \CN{if the current payment estimate $\srho_i(\stilde_i)$} is still less than $\rbudget{i}^t$, more seeds can be assigned to advertiser $i$. Thus, we will need another iteration and we further revise our estimation of $s_i$. The new value, $\tilde{s}_i^{t+1}$, is obtained as follows:}
+ 
+
+\CN{
+\begin{align}\label{eq:latentCA}
+\tilde{s}_i^{t+1} \gets \tilde{s}_i^t + \left\lfloor \dfrac{\rbudget{i}^t - \srho_i(\stilde_i)}{c_i^{max} + \cpe{i} \cdot (n \cdot F_{\RR_i}^{max} + \frac{\varepsilon}{2} \cdot \CC{\etb{i}{\tilde{s}_i^t}})}  \right\rfloor
+\end{align} \enlargethispage{\baselineskip}
+}
+where $c_i^{max} := \underset{v \in V} {\max}~ c_i(v)$ is the maximum seed user incentive cost for advertiser $i$, and $F_{\RR_i}^{max} := \underset{u \in V \setminus \stilde_i} {\max}F_{\RR_i}(u)$. This ensures we do not overestimate as future seeds have diminishing marginal gains, thanks to submodularity, and incentives bounded by $c_i^{max}$.
+
+%\note[cigdem]{We are doing a quick and dirty fix on many things in this section.. I am not sure whether the numerator in Eq.\ref{eq:latentCA} should use the actual budget or the refined budget. Also I am not sure whether we should add the iterative fix on $\eta_i$, hence, $\rbudget{i}$ to the pseudocodes?? I am not sure what's the best strategy without creating a lot of differences from the published version. So far I have kept assignment of $\eta_i$ as black-box (as if given) and only added lines 4 and 23 to pseudocode given in Algorithm 2 without adding lines on how to iteratively revise it as a function of $\tilde{s}_i$.}
+
+\input{pseudocodes.tex}
+
+%\note[cigdem]{Notice that I have changed $\pi_i(\cdot)$ and $\rho_i(\cdot)$ as $\spi_i(\cdot)$ and $\srho_i(\cdot)$ all over in this section to reflect that the revenue and payment are estimates as well. Also now using $\tilde{s_i}$ in pseudocodes instead of $s_i$ to reflect that it is estimated as well.}
+
+\CA{While the core logic of \fastcs (resp. \fastca) is still based on the greedy seed selection outlined for \CSRM (resp. \CARM),  \fastcs (resp. \fastca) uses random RR-sets samples for the scalable estimation of influence spread.} \CA{Since \fastca and \fastcs are very similar, differing only in their greedy seed selection criteria, we only provide the pseudocode of \fastcs (Algorithm~\ref{alg:fastCS}).} \CA{Algorithm \fastcs works as follows. For every advertiser $j$, we initially set the latent seed set size \CN{$\tilde{s}_j = 1$} (a conservative but safe estimate), create a sample $\RR_j$ of $\theta_j = L_{\CC{j}}(\tilde{s}_j, \varepsilon)$ RR-sets, \CN{compute the refined budget $\rbudget{j}$ for $\tilde{s}_j$}, and the safe upper bound $\sib{j}$ (lines 1 -- \CN{6}). In the main loop, we follow the greedy selection logic of \CSRM. That is, in each round, we first invoke Algorithm~\ref{alg:rrBestCSNode} to find an unassigned candidate node $v_j$ that has the largest coverage-to-cost ratio~\footnote{\scriptsize Following the definition of \CN{$\srho_j(\cdot)$} as a function of \CN{$\spi_j(\cdot)$}, the node with the largest rate of marginal gain in revenue per marginal gain in payment for a given ad $j$ corresponds to the node $u$ with the largest coverage-to-cost ratio for ad $j$.} for each advertiser $j$ whose budget is not yet exhausted. Then, we select, among these (node,advertiser) pairs, the feasible pair $(v_i, i)$ that has the largest rate of marginal gain in revenue per marginal gain in payment and add it to the solution set, and remove from $\RR_i$ the RR-sets that are covered by node $v_i$ (lines \CN{10 -- 15}). While doing so, whenever \CN{$|\stilde_i|  = \tilde{s}_i$}, we update the latent seed set size $\tilde{s}_i$ using Eq.~\ref{eq:latentCA}, \CN{hence $\rbudget{i}$},  and sample \CC{$\max\{0, L_{\CC{i}}(\CN{\sib{i}}, \tilde{s}_i,\varepsilon) - \theta_i \}$} additional RR-sets into $\RR_i$. Note that, after adding additional RR-sets, we update the influence spread estimation of current $\stilde_i$ w.r.t. the updated sample $\RR_i$ by invoking Algorithm~\ref{alg:rrUpdateEst} to ensure that future marginal gain estimations are accurate (line \CN{22}). The main loop executes until the budget of each advertiser is exhausted or no more eligible seed can be found.}
+
+%Then, iteratively it selects and assigns seeds until the budget of each advertiser is exhausted or no more eligible seed can be found.
+%In each round, it first invokes Algorithm~\ref{alg:rrBestCSNode} to find a candidate seed which has the largest coverage-to-cost ratio~\footnote{\scriptsize Following the definition of $\rho_j(\cdot)$, the node with the largest rate of marginal gain in revenue per marginal gain in payment for a given ad $j$ corresponds to the node $u$ with the largest coverage-to-cost ratio for ad $j$.} for each advertiser. Then, it picks the seed-ad pair such that the rate of marginal gain in revenue per marginal gain in payment is the greatest, and updates the corresponding RR-sets $\RR_i$ (line 9 -- 13). Finally, the algorithm updates the latent seed set size by invoking Eq.~\ref{eq:latentCA}, and samples additional RR-sets according to the updated estimates.
+
+For \fastca, there are only two differences. First, line~\ref{line:greedySelectBest} of Algorithm~\ref{alg:fastCS} is replaced by $$(v_j, cov_j(v_j)) \gets \mathsf{SelectBestCANode}(\RR_j) \;\; \mbox{(Algorithm~\ref{alg:rrBestCANode})}.$$ Second, line~\ref{line:greedyCriterCS} of Algorithm~\ref{alg:fastCS} is replaced by \begin{align*}i \leftarrow \argmax_{j=1}^h \pi_j(v_j | \stilde_j) \; \mbox{ subject to: } \rho_j(\stilde_j \cup \{v_j\}) \le B_j \; \\ \wedge \; \text{assigned}[v_j] = \text{false}.\end{align*}
+
+%\CN{
+%\enlargethispage{\baselineskip}
+%\spara{Addressing  budget feasibility.} 
+%}
+
+
+\enlargethispage{\baselineskip}
+\spara{Deterioration of approximation guarantees.} \LL{Since \fastca and \fastcs %, the scalable realizations of \CARM and \CSRM respectively,
+use random RR-sets for the accurate estimation of $\sigma_i(\cdot), \forall i \in [h]$, their approximation guarantees slightly deteriorate from the ones of \CARM and \CSRM (see Theorems \ref{theo:CARM} and \ref{theo:cs-earm1}). Such deterioration is common to all the state-of-the-art IM algorithms~\cite{borgs14, tang14, tang2015influence, NguyenTD16} that similarly use random RR-sets for influence spread estimation. Our next result provides the deteriorated approximation guarantees for \fastca and \fastcs. }
+%The proof, omitted for brevity, appears in \cite{us-arxiv}.
+\CA{\begin{theorem}\label{theo:deterioratedGaranti}
+\CC{W.p. at least $1-n^{-\ell}$, \fastca (resp. \fastcs) returns a solution $\vecstilde = (\stilde_1, \ldots, \stilde_h)$ that satisfies}
+%achieves an approximation that satisfies
+\begin{align*}
+\pi(\vec{\tilde{S}}) &\ge \pi(\vec{S^*}) \cdot \beta  -  \sum_{i \in [h]} cpe(i) \cdot  \varepsilon \cdot OPT_{\tilde{s}_i}.
+\end{align*}
+where $\vecsstar = (\sstar_1, \ldots, \sstar_h)$ is the optimal allocation, \eat{$\vecstilde = (\stilde_1, \ldots, \stilde_h)$ is the approximate greedy solution that \fastca (resp. \fastcs) returns,} \CC{$\tilde{s}_i$ is the final latent seed set size estimated for each $i$ upon termination of \fastca (resp. \fastcs)}, and $\beta$ is the approximation guarantee given in Theorem \ref{theo:CARM} (resp. Theorem \ref{theo:cs-earm1}).
+\end{theorem}}
+%%%%%%%%%%%%%%%%%%%%%%%%% include in arxiv start
+\begin{proof}
+\CC{Let $\vecssample = (\ssample_1, \ldots, \ssample_h)$ denote the optimal solution to \RM problem on the sample \CC{with refined budget constraints}, i.e., the feasible allocation that maximizes $\sum_{i \in [h]} \spi_i(S_i)$ subject to \CC{$\srho_i(S_i) \le \rbudget{i}$, $\forall i \in [h]$}. Since $\vecstilde$ is the cost-agnostic (resp., cost-sensitive) greedy solution to \RM on the sample, we have:
+\begin{align}
+\label{eq:equationrm1}
+\sum_i \cpe{i} \cdot n \cdot \isfrac{\stilde_i} \ge \beta \cdot \sum_i \cpe{i} \cdot n \cdot \isfrac{\ssample_i}.
+\end{align} 
+Given that $\vecssample$ is the optimal solution to solving \RM on the sample, we also have: 
+\begin{align}
+\label{eq:equationrm2}
+\sum_i \cpe{i} \cdot n \cdot \isfrac{\ssample_i} \ge \sum_i \cpe{i} \cdot n \cdot \isfrac{\sstar_i}.
+\end{align}}
+
+%\note[Cigdem]{We have $|\stilde_i| \le \tilde{s}_i$ and $|\ssample_i| \le \tilde{s}_i$ thanks to the way we estimate $\tilde{s}_i$ on line 19 of Algorithm 2. So we are sure that Eq.\ref{eq:equationrm1} holds as the sample size is big enough to accurately estimate the spread of at most $\tilde{s}_i$ seeds. But how do we know that Eq.~\ref{eq:equationrm2} holds for sure? To be able to claim Eq.~\ref{eq:equationrm2}, we need to be sure that estimated payment of $\sstar_i$ is feasible, i.e., $\srho(\sstar_i) \le \rbudget{i}$: I am using $\rbudget{i}$ in this argument instead of $B_i$ because that is the feasibility constraint we use to return $\stilde_i$ and define $\ssample_i$ so that $Eq.\ref{eq:equationrm1}$ surely holds. This issue could be fixed if we define $\ssample_i$ as optimal to RM when using  normal budget $B_i$i.e., when the constraint for RM is $\srho_i{S_i} \le B_i$, $\forall i \in [h]$: but then we'd need to make sure that Eq.\ref{eq:equationrm1} still holds even when the budget constraint on $\stilde_i$ is with $\rbudget{i}$ and the constraint on $\ssample_i$ is with $B_i$. Since the functions are monotone, it looks indeed safe to claim that  Eq.\ref{eq:equationrm1} would still hold with  different constraints but we'd probably need to rigorously show that. Let's say we show that and fix the issue with Eq.\ref{eq:equationrm2}. Then, there is another problem which I also highlight with purple coloredthe sample size should be good enough to estimate the spread of $\sstar_i$ which implies that we should have $|\sstar_i| \le \tilde{s}_i$. We don't know it that really holds. And on a more definition level, I'm not sure whether our definition of $s_i$ should be the real seed set size of the greedy solution that algorithm 1 returns in the presence of an influence oracle or whether we should assume $s_i$ is the cardinality of the optimal $\sstar_i$. (Notice that this has nothing to do with defining the error term w.r.t. $OPT_{i, s_i}$: whatever $s_i$ we define, $OPT_{i, s_i}$ always corresponds to the influence maximizing optimal spread since we use TIM directly. If I was doing this  paper now, I would define RR sets sample on the ground set of node -advertiser pairs as I did with my diversity-exposure paper, it's the solid way to do things in this kind of problems.)}
+
+%\note[cigdem]{now the deteriotion analysis should be correct, haven't edited the proof to reflect that the purple equation below follows from using $\sib{i}$ for sample size derivation but will do later.}
+Furthermore, it follows from Lemma~\ref{lemma:newSS} that, for any set $S$ of at most $\sib{i}$ seeds, we have $\left| n\cdot F_{\RR_i}(S) - \sigma_i(S) \right| \ge \dfrac{\varepsilon}{2} \cdot OPT_{i, \tilde{s}_i}$ w.p. at most $\frac{n^{-\ell}}{\binom{n}{\sib{i}}}$. Notice that, we also have $|\sstar_i| \le \sib{i}$ by definition. Thus, by using Eqs.\ref{eq:equationrm1} and \ref{eq:equationrm2} and a union bound over all $\binom{n}{\sib{i}}$ estimations, w.p. at least $1-n^{-\ell}$ we have: 
+
+%\CC{Reminding that for any set $S$ of at most $\sib{i}$ seeds, we have $\left| n\cdot F_{\RR_i}(S) - \sigma_i(S) \right| \ge \dfrac{\varepsilon}{2} \cdot OPT_{i, \tilde{s}_i}$ w.p. at most $\frac{n^{-ell}{\binom{n}{\sib{i}}}$, and that \CN{$|\sstar_i| \le \sib{i}$} for each $i$, it follows from \CN{Lemma~\ref{lemma:newSS}} and Eqs.\ref{eq:equationrm1} and \ref{eq:equationrm2} that}
+
+\CN{\begin{align*}
+&\sum_i \cpe{i} \cdot \sigma_i(\stilde_i) \\
+&\ge \sum_i \cpe{i} \cdot \left(n \cdot \isfrac{\stilde_i} - \frac{\varepsilon}{2} \cdot OPT_{i,\tilde{s}_i} \right) \\
+&= \sum_i \cpe{i} \cdot n \cdot \isfrac{\stilde_i} - \sum_i \cpe{i} \cdot \frac{\varepsilon}{2} \cdot OPT_{i,\tilde{s}_i} \\
+&\ge \beta \cdot \sum_i \cpe{i} \cdot n \cdot \isfrac{\ssample_i} - \sum_i \cpe{i} \cdot \frac{\varepsilon}{2} \cdot OPT_{i,\tilde{s}_i} \\
+&\ge \beta \cdot \sum_i \cpe{i} \cdot n \cdot \isfrac{\sstar_i} - \sum_i \cpe{i} \cdot \frac{\varepsilon}{2} \cdot OPT_{i,\tilde{s}_i} \\
+&\ge \beta \cdot \sum_i \cpe{i} \cdot \CC{\left(\sigma_i(\sstar_i) - \frac{\varepsilon}{2} \cdot OPT_{i,\tilde{s}_i}\right)} \\
+&- \sum_i \cpe{i}\cdot \frac{\varepsilon}{2} \cdot OPT_{i,\tilde{s}_i} \\
+&\ge \beta \cdot \pi(\vecsstar) - \sum_{i \in [h]} \cpe{i} \cdot  \varepsilon \cdot OPT_{i,\tilde{s}_i},
+\end{align*}}
+\ravi{where the last inequality follows upon noting that $\beta < 1$.}  
+\end{proof}
+
+
+As a corollary to Theorem~\ref{theo:deterioratedGaranti}, Lemma~\ref{lemma:ubEta} and Lemma~\ref{lemma:newSS}, the following result is immediate. 
+
+\CC{\begin{theorem}\label{theo:finalResult}
+W.p. at least $1-n^{-\ell}$, \fastca (resp. \fastcs) returns an approximate greedy solution $\vecstilde = (\stilde_1, \ldots, \stilde_h)$ that is budget feasible, i.e., $\rho_i(\stilde_i) \le B_i$, for all $i$, and achieves an approximation that satisfies 
+\begin{align*}
+\pi(\vec{\tilde{S}}) &\ge \pi(\vec{S^*}) \cdot \beta  -  \sum_{i \in [h]} cpe(i) \cdot  \varepsilon \cdot OPT_{\tilde{s}_i}.
+\end{align*}
+$\beta$ is the approximation guarantee given in Theorem \ref{theo:CARM} (resp. Theorem \ref{theo:cs-earm1}).
+\end{theorem}}
+
+
+
+
+
+
+
+
+
+% incorrect proof below
+\eat{
+\CA{\begin{proof}
+We will first provide our analysis for the case of TIM~\cite{tang14}. We know that the expected spread of every set of size at most $s$ is accurately estimated (see Eq.~\ref{eq:Lemma3}), %holds for all $S$ with $|S| \le s$,
+w.p. at least $1 - 1 / n^{\ell}$, via union bound. Then w.p. at least $1 - 1 / n^{\ell}$ we have:
+\begin{align}\label{eq:timApprox}
+\sigma(\tilde{S_g}) &\ge \sigma(S_g) - \varepsilon \cdot  OPT_{s}
+\end{align}
+where $S_g$ is the real greedy solution and $\tilde{S_g}$ is the approximate greedy solution that TIM returns, i.e., $n \cdot F_{\RR}(\tilde{S_g}) \ge n \cdot F_{\RR}(S_g)$. The correctness of Eq.~\ref{eq:timApprox} follows from the following case analysis: (\emph{i}) $\tilde{S_g}$ is the real greedy solution $S_g$ itself; (\emph{ii}) $\tilde{S_g}$ is a set with $\sigma(\tilde{S_g}) > \sigma(S_g)$; or (\emph{iii}) $\tilde{S_g}$ is a set with $\sigma(\tilde{S_g}) <  \sigma(S_g)$ such that its maximum possible accurate estimate (that satisfies Eq.~\ref{eq:Lemma3}) is higher than the minimum possible accurate estimate of $\sigma(S_g)$, hence it is returned by TIM instead of $S_g$, i.e., $\sigma(\tilde{S_g}) + \dfrac{\varepsilon}{2} \cdot  OPT_{s} \ge n \cdot F_{\RR}(\tilde{S_g}) \ge n \cdot F_{\RR}(S_g) \ge \sigma(S_g) - \dfrac{\varepsilon}{2} \cdot  OPT_{s}$. Obviously, the approximation guarantee does not deteriorate from $(1-1/e)$ for the first two cases.
+For case (\emph{iii}) we have:
+\begin{align}
+\sigma(\tilde{S_g}) &\ge \sigma(S_g) - \varepsilon \cdot  OPT_{s}  \\
+&\ge (1-1/e) \cdot OPT_s - \varepsilon \cdot  OPT_{s}.
+\end{align}
+Now, we start the deterioration analysis for \fastca and \fastcs with a similar reasoning as our analysis for TIM. Let $\vecalloc = (S_1, \cdots, S_h)$ denote the greedy solution that \CARM (resp. \CSRM) returns and let $\vec{\tilde{S}} = (\tilde{S_1}, \cdots, \tilde{S_h})$ denote the approximate greedy solution that \fastca (resp. \fastcs) returns. For each $i \in [h]$, denote its latent seed set size estimation as $s_i$, then w.p. at least $1 - 1 / n^{\ell}$ we have the following:
+\begin{align}\label{eq:rmApprox}
+\sigma_i(\tilde{S_i}) &\ge \sigma_i(S_i) - \varepsilon \cdot OPT_{{s}_i}
+\end{align}
+following an analysis analogous to that for TIM above.
+Then, we have for each $i \in [h]$:
+\begin{align*}
+\pi(\tilde{S_i}) &=  cpe(i) \cdot \sigma_i(\tilde{S_i}) \\
+&\ge cpe(i) \cdot (\sigma_i(S_i) -  \varepsilon \cdot OPT_{{s}_i})  \\
+&= \pi_i(S_i) - cpe(i) \cdot  \varepsilon \cdot OPT_{{s}_i}.
+\end{align*}
+Hence, we have
+\begin{align*}
+\pi(\vec{\tilde{S}}) &\ge \pi(\vec{S}) - \sum_{i \in [h]} cpe(i) \cdot  \varepsilon \cdot OPT_{{s}_i} \\
+&\ge \pi(\vec{S^*}) \cdot \beta  -  \sum_{i \in [h]} cpe(i) \cdot  \varepsilon \cdot OPT_{{s}_i}.
+\end{align*}
+where $\vec{S^*}$ is the optimal allocation and $\beta$ is the approximation guarantee given in Theorem \ref{theo:CARM} (resp. Theorem \ref{theo:cs-earm1}).
+\end{proof}}
+}
+%%%%%%%%%%%%%%%%%%%%%%%%% include in arxiv end
+
